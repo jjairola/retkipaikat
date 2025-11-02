@@ -11,3 +11,15 @@ Sovelluksessa käyttäjät pystyvät jakamaan retkipaikkojaan. Retkipaikassa luk
 - Käyttäjä pystyy antamaan retkipaikalle kommentin ja arvosanan. Retkipaikasta näytetään kommentit ja keskimääräinen arvosana.
 
 Tässä pääasiallinen tietokohde on retkipaikka ja toissijainen tietokohde on kommentti retkipaikkaan.
+
+## Ohjelman suoritus
+
+Ohjeet (Mac/Linux):
+
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cd src
+flash run
+```
