@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+  <title>{% block title %}Retkipaikat{% endblock %}</title>
+  <link rel="stylesheet" href="/static/main.css">
+</head>
+
+<body>
+  <nav class="max-800">
+
+    <ul class="nav-links">
+      <li><a class="button" href="/">Etusivu</a></li>
+      <li><a class="button" href="/find-destination">Etsi retkipaikka</a></li>
+      {% if session.user_id %}
+      <li><a class="button" href="/add-destination">Uusi retkipaikka</a></li>
+      <li><a class="button" href="/logout">Kirjaudu ulos</a></li>
+      {% else %}
+      <li><a class="button" href="/login">Kirjaudu sisään</a></li>
+      <li><a class="button" href="/register">Luo tunnus</a></li>
+      {% endif %}
+    </ul>
+
+  </nav>
+
+  <main class="max-800 content">
+    <h1>Retkipaikat</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+      <div class="toast {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% block content %}
+    {% endblock %}
+  </main>
+  <div class="max-800">
+    Copyright &copy; 2025 Retkipaikat.
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ destination.name }} - Retkipaikat{% endblock %}
+
+{% block content %}
+
+<h2>{{ destination.name }}</h2>
+
+<div>
+    <div>
+        <img src="/static/placeholder.png" alt="{{ destination.name }}">
+    </div>
+    <div>
+        <p><strong>Kuvaus:</strong> {{ destination.description }}</p>
+        <p><strong>Kunta:</strong> {{ destination.municipality }}</p>
+        <p><strong>Lisännyt:</strong> {{ destination.username }}</p>
+        {% if destination.classifications %}
+        <p><strong>Luokitukset:</strong></p>
+        <div class="flex-warp mb-4">
+            {% for classification in destination.classifications.split(',') %}
+            <span class="pill">{{ classification }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div>
+{% if session.user_id and session.user_id == destination.user_id %}
+<a class="button" href="/destination/{{ destination.id }}/edit" class="button">Muokkaa</a>
+<a class="button" href="/destination/{{ destination.id }}/delete" class="button">Poista</a>
+{% endif %}
+</div>
+{% endblock %}

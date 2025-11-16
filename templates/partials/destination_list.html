@@ -1,0 +1,17 @@
+<div class="flex">
+    <div class="p-4">
+        <img src="/static/placeholder.png" alt="{{ destination.name }}" class="w-full h-auto rounded">
+    </div>
+    <div class="flex-1">
+        <h3><a href="/destination/{{ destination.id }}" class="text-blue-600 hover:underline">{{ destination.name }}</a>
+        </h3>
+        <p>{{ destination.description }}</p>
+        {% if destination.classifications %}
+        <div class="flex flex-wrap">
+            {% for classification in destination.classifications.split(',') %}
+            <span class="pill">{{ classification }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>

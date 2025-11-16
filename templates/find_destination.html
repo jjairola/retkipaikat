@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block title %}Etsi retkipaikkaa{% endblock %}
+
+{% block content %}
+<h2>Etsi retkipaikkaa hakusanalla</h2>
+
+<form action="/find-destination" method="get">
+    <div>
+        <label>Hakusana</label>
+        <input type="text" name="query" value="{{ query }}">
+        <input type="submit" value="Etsi">
+    </div>
+</form>
+
+<h2>Etsi retkipaikkaa luokituksella</h2>
+
+<ul>
+{% for classification in classifications %}
+<li><a href="/find-destination?classification={{ classification.id }}">{{ classification.name }}</a></li>
+{% endfor %}
+</ul>
+
+
+<h3>Tulokset</h3>
+{% if results %}
+{% for destination in results %}
+    {% include "partials/destination_list.html" %}
+{% endfor %}
+{% else %}
+<p>Ei tuloksia.</p>
+{% endif %}
+{% endblock %}

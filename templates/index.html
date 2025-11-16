@@ -1,0 +1,13 @@
+
+{% extends "layout.html" %}
+
+{% block title %}Retkipaikat{% endblock %}
+
+{% block content %}
+<h2>Suosituimmat retkipaikat</h2>
+
+{% for destination in destinations %}
+    {% include "partials/destination_list.html" %}
+{% endfor %}
+
+{% endblock %}

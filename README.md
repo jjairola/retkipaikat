@@ -12,14 +12,25 @@ Sovelluksessa käyttäjät pystyvät jakamaan retkipaikkojaan. Retkipaikassa luk
 
 Tässä pääasiallinen tietokohde on retkipaikka ja toissijainen tietokohde on kommentti retkipaikkaan.
 
-## Ohjelman suoritus
+## Sovelluksen asennus
 
-Ohjeet (Mac/Linux):
+Asenna `flask`-kirjasto.
 
-```bash
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-cd src
-flash run
 ```
+$ pip install flask
+```
+
+Luo tietokanta ja alkutiedot:
+
+```
+sqlite3 database.db < schema.sql
+sqlite3 database.db < init.sql
+```
+
+Käynnistä ohjelma:
+
+```
+$ flask run
+```
+
+Mene selaimella http://localhost:5000

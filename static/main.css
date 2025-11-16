@@ -1,0 +1,131 @@
+:root {
+    --font-color: rgba(0, 0, 0, 0.8);
+    --primary-color: #3498db;
+    --background-color: #f4f4f4;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--background-color);
+    color: var(--font-color);
+    margin: 0;
+    padding: 0;
+}
+
+.max-800 {
+    max-width: 800px;
+    margin: 0 auto;
+    margin-bottom: 20px;
+}
+
+main {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+nav li {
+    display: inline-block;
+    margin-right: 10px;
+    list-style-type: none;
+}
+
+button,
+.button,
+input[type="submit"],
+input::file-selector-button {
+    margin: 0 10px;
+    padding: 8px 16px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+button:hover,
+.button:hover,
+input[type="submit"]:hover {
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="password"],
+input[type="file"],
+select,
+textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.toast {
+    padding: 10px 20px;
+    border-radius: 4px;
+    color: black;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.toast.message {
+    background-color: #45a04930;
+    border: 2px solid #45a049;
+}
+
+.toast.error {
+    background-color: #f4433630;
+    border: 2px solid #da190b;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-1 {
+    flex: 1 1 0%;
+}
+
+.flex-none {
+    flex: none;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.w-36 {
+    width: 9rem;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.p-4 {
+    padding: 1rem;
+}
+
+.pill {
+    display: inline-block;
+    background-color: #e0e0e0;
+    color: #333;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}

@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block title %}Muokkaa {{ destination.name }}{% endblock %}
+
+{% block content %}
+<h2>Muokkaa retkipaikkaa: {{ destination.name }}</h2>
+
+{% with submit_text="Tallenna muutokset" %}
+{% include "partials/destination_form.html" %}
+{% endwith %}
+
+{% endblock %}

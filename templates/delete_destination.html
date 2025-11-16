@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block title %}Poista {{ destination.name }}{% endblock %}
+
+{% block content %}
+<h2>Poista retkipaikka: {{ destination.name }}</h2>
+
+<p>Oletko varma, että haluat poistaa tämän retkipaikan?</p>
+
+<form action="/destination/{{ destination.id }}/delete" method="post">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+    <input class="danger" type="submit" value="Kyllä" class="button">
+</form>
+
+{% endblock %}
