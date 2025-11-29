@@ -1,5 +1,7 @@
 import db
 
+class DestinationError(Exception):
+    pass
 
 def add_destination(name, description, municipality, user_id, classification_ids):
     sql = """INSERT INTO destinations (name, description, municipality, user_id)
