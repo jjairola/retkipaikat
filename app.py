@@ -29,37 +29,41 @@ def add_destination():
     require_login()
 
     if request.method == "GET":
+        form_data, errors = session_utils.get_form_and_errors()
         classifications = destinations.get_all_classifications()
-        return render_template("add_destination.html", classifications=classifications)
+        return render_template(
+            "add_destination.html",
+            classifications=classifications,
+            form_data=form_data,
+            errors=errors,
+        )
 
     if request.method == "POST":
         schema = {
-            "name": {"is_required": True, "translation": "Nimi"},
-            "description": {"is_required": True, "translation": "Kuvaus"},
-            "municipality": {"is_required": True, "translation": "Kunta"},
+            "name": {"required": True, "translation": "Nimi"},
+            "description": {"required": True, "translation": "Kuvaus"},
+            "municipality": {"required": True, "translation": "Kunta"},
         }
-        errors = validator.validator(request.form, schema)
+        validated, errors = validator.validator(request.form, schema)
         if errors:
-            for error in errors.values():
-                flash(error, ", ".join(errors.values()))
+            session_utils.set_form_and_errors(validated, errors)
             return redirect("/add-destination")
 
-        name = request.form["name"]
-        description = request.form["description"]
-        municipality = request.form["municipality"]
+        # TODO
         classification_ids = request.form.getlist("classifications")
-
-        if not name or not description or not municipality:
-            flash("Kaikki kentät ovat pakollisia.", "error")
-            return redirect("/add-destination")
 
         try:
             destinations.add_destination(
-                name, description, municipality, session["user_id"], classification_ids
+                validated["name"],
+                validated["description"],
+                validated["municipality"],
+                session["user_id"],
+                classification_ids,
             )
             flash("Retkipaikka lisätty onnistuneesti.")
             return redirect("/")
         except Exception as e:
+            print(e)
             flash("Virhe retkipaikan lisäämisessä.", "error")
             return redirect("/add-destination")
 
@@ -86,16 +90,26 @@ def find_destination():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    schema = {
+        "username": {
+            "required": True,
+            "translation": "Käyttäjätunnus",
+            "min": 5,
+            "max": 20,
+        },
+        "password1": {"required": True, "translation": "Salasana", "min": 8},
+        "password2": {"required": True, "translation": "Vahvista salasana", "min": 8},
+    }
     if request.method == "GET":
         form_data, errors = session_utils.get_form_and_errors()
-        return render_template("register.html", form_data=form_data, errors=errors)
+        return render_template(
+            "register.html",
+            form_data=form_data,
+            errors=errors,
+            schema=validator.schema_to_input(schema),
+        )
 
     if request.method == "POST":
-        schema = {
-            "username": {"is_required": True, "translation": "Käyttäjätunnus"},
-            "password1": {"is_required": True, "translation": "Salasana"},
-            "password2": {"is_required": True, "translation": "Vahvista salasana"},
-        }
         validated, errors = validator.validator(request.form, schema)
         if errors:
             flash("Lomakkeen tiedot eivät kelpaa", "error")
@@ -114,15 +128,21 @@ def register():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    schema = {
+        "username": {"required": True, "translation": "Käyttäjätunnus"},
+        "password": {"required": True, "translation": "Salasana"},
+    }
+
     if request.method == "GET":
         form_data, errors = session_utils.get_form_and_errors()
-        return render_template("login.html", form_data=form_data, errors=errors)
+        return render_template(
+            "login.html",
+            form_data=form_data,
+            errors=errors,
+            schema=validator.schema_to_input(schema),
+        )
 
     if request.method == "POST":
-        schema = {
-            "username": {"is_required": True, "translation": "Käyttäjätunnus"},
-            "password": {"is_required": True, "translation": "Salasana"},
-        }
         validated, errors = validator.validator(request.form, schema)
         if errors:
             flash("Lomakkeen tiedot eivät kelpaa", "error")

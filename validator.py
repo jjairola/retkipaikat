@@ -1,4 +1,3 @@
-
 def is_number(value):
     try:
         value = int(value)
@@ -8,18 +7,38 @@ def is_number(value):
 
 
 validators = {
-    "min_length": [lambda value, param, dto: len(value) >= param, "{} on liian lyhyt."],
-    "max_length": [lambda value, param, dto: len(value) <= param, "{} on liian pitkä."],
-    "is_number": [
+    "min": [lambda value, param, dto: len(value) >= param, "{} on liian lyhyt."],
+    "maxh": [lambda value, param, dto: len(value) <= param, "{} on liian pitkä."],
+    "number": [
         lambda value, param, dto: is_number(value) == param,
         "{} pitää olla numero.",
     ],
-    "is_required": [lambda value, param, dto: len(value) > 0, "{} on pakollinen."],
+    "required": [lambda value, param, dto: len(value) > 0, "{} on pakollinen."],
     "equals": [
         lambda value, param, dto: value == dto.get(param, None),
         "{} eivät ole samoja.",
     ],
+    "trim": [True, "For placing only front-end validation purposes. Always trimmed."],
 }
+
+
+def schema_to_input(schema):
+    inputs = {}
+    for key, rules in schema.items():
+        options = []
+        for validator, param in rules.items():
+            
+            if validator == "required" and param is True:
+                options.append("required")
+            if validator == "min":
+                options.append(f"minlength={param}")
+            if validator == "max":
+                options.append(f"maxlength={param}")
+            if validator == "trim" and param is True:
+                options.append('pattern="\S+"')
+
+        inputs[key] = " ".join(options)
+    return inputs
 
 
 def validator(data, schema):
@@ -44,12 +63,12 @@ def validator(data, schema):
 if __name__ == "__main__":
     schema = {
         "username": {
-            "min_length": 6,
-            "max_length": 12,
+            "min": 6,
+            "max": 12,
             "translation": "käyttäjätunnus",
         },
-        "password": {"min_length": 8},
-        "test": {"is_number": True},
+        "password": {"min": 8},
+        "test": {"number": True},
         "username2": {"equals": "username"},
     }
     validated, errors = validator(
