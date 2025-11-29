@@ -8,15 +8,24 @@
 <form action="/register" method="post">
   <p>
     <label for="username">Tunnus</label>
-    <input type="text" name="username" id="username" />
+    <input type="text" name="username" id="username" value="{{ form_data.username }}" />
+    {% if errors and errors.username %}
+    <span class="error">{{ errors.username }}</span>
+    {% endif %}
   </p>
   <p>
     <label for="password1">Salasana</label>
     <input type="password" name="password1" id="password1" />
+    {% if errors and errors.password1 %}
+    <span class="error">{{ errors.password1 }}</span>
+    {% endif %}
   </p>
   <p>
     <label for="password2">Salasana uudestaan</label>
     <input type="password" name="password2" id="password2" />
+    {% if errors and errors.password2 %}
+    <span class="error">{{ errors.password2 }}</span>
+    {% endif %}
   </p>
   <input type="submit" value="Luo tunnus" />
 </form>

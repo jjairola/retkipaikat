@@ -1,3 +1,4 @@
+
 def is_number(value):
     try:
         value = int(value)
@@ -23,31 +24,36 @@ validators = {
 
 def validator(data, schema):
     errors = {}
-    for key, schemas in schema.items():
-        for validator, param in schemas.items():
+    validated = {}
+    for key, rules in schema.items():
+        for validator, param in rules.items():
             if validator == "translation":
                 continue
-            valid = validators[validator][0](data[key], param, data)
-            if not valid:
-                translated_key = schemas.get("translation", key)
+            is_valid = validators[validator][0](data[key], param, data)
+            if not is_valid:
+                translated_key = rules.get("translation", key)
                 errors[key] = validators[validator][1].format(translated_key)
                 break
+            else:
+                validated[key] = data[key].strip()
 
-    return errors if len(errors.keys()) else None
+    return validated, errors if len(errors.keys()) else None
 
 
 # Tests: python3 validator.py
 if __name__ == "__main__":
     schema = {
-        "username": {"min_length": 6, "translation": "salasana"},
+        "username": {
+            "min_length": 6,
+            "max_length": 12,
+            "translation": "käyttäjätunnus",
+        },
         "password": {"min_length": 8},
         "test": {"is_number": True},
         "username2": {"equals": "username"},
     }
-    errors = validator(
+    validated, errors = validator(
         {"username": "jyrki", "username2": "sjdg", "password": "", "test": "3"}, schema
     )
 
     print(errors)
-
-    

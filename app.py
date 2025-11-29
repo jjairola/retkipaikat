@@ -4,6 +4,8 @@ import secrets
 import config
 import users
 import destinations
+import validator
+import session as session_utils
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -29,6 +31,17 @@ def add_destination():
         return render_template("add_destination.html", classifications=classifications)
 
     if request.method == "POST":
+        schema = {
+            "name": {"is_required": True, "translation": "Nimi"},
+            "description": {"is_required": True, "translation": "Kuvaus"},
+            "municipality": {"is_required": True, "translation": "Kunta"},
+        }
+        errors = validator.validator(request.form, schema)
+        if errors:
+            for error in errors.values():
+                flash(error, ", ".join(errors.values()))
+            return redirect("/add-destination")
+
         name = request.form["name"]
         description = request.form["description"]
         municipality = request.form["municipality"]
@@ -52,8 +65,8 @@ def add_destination():
 @app.route("/find-destination")
 def find_destination():
     classifications = destinations.get_all_classifications()
-    query = request.args.get('query', '')
-    classification_id = request.args.get('classification')
+    query = request.args.get("query", "")
+    classification_id = request.args.get("classification")
 
     results = []
     if query:
@@ -61,24 +74,34 @@ def find_destination():
     elif classification_id:
         results = destinations.get_destinations_by_classification(classification_id)
 
-    return render_template("find_destination.html", classifications=classifications, query=query, results=results)
+    return render_template(
+        "find_destination.html",
+        classifications=classifications,
+        query=query,
+        results=results,
+    )
 
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "GET":
-        return render_template("register.html")
+        form_data, errors = session_utils.get_form_and_errors()
+        return render_template("register.html", form_data=form_data, errors=errors)
 
     if request.method == "POST":
-        username = request.form["username"]
-        password1 = request.form["password1"]
-        password2 = request.form["password2"]
-        if password1 != password2:
-            flash("Salasanat eivät ole samoja.", "error")
+        schema = {
+            "username": {"is_required": True, "translation": "Käyttäjätunnus"},
+            "password1": {"is_required": True, "translation": "Salasana"},
+            "password2": {"is_required": True, "translation": "Vahvista salasana"},
+        }
+        validated, errors = validator.validator(request.form, schema)
+        if errors:
+            flash("Lomakkeen tiedot eivät kelpaa", "error")
+            session_utils.set_form_and_errors(validated, errors)
             return redirect("/register")
 
         try:
-            users.create_user(username, password1)
+            users.create_user(validated["username"], validated["password1"])
             flash("Käyttäjätili luotu. Voit kirjautua sisään!")
         except users.UserError:
             flash("Rekisteröityinen ei kelpaava.", "error")
@@ -123,17 +146,25 @@ def destination_page(destination_id):
         abort(404)
     return render_template("destination.html", destination=destination)
 
+
 @app.route("/destination/<int:destination_id>/edit", methods=["GET", "POST"])
 def edit_destination(destination_id):
     require_login()
     destination = destinations.get_destination_by_id(destination_id)
-    if not destination or destination['user_id'] != session["user_id"]:
+    if not destination or destination["user_id"] != session["user_id"]:
         abort(403)
 
     if request.method == "GET":
         classifications = destinations.get_all_classifications()
-        current_classifications = destinations.get_destination_classifications_ids(destination_id)
-        return render_template("edit_destination.html", destination=destination, classifications=classifications, current_classifications=current_classifications)
+        current_classifications = destinations.get_destination_classifications_ids(
+            destination_id
+        )
+        return render_template(
+            "edit_destination.html",
+            destination=destination,
+            classifications=classifications,
+            current_classifications=current_classifications,
+        )
 
     if request.method == "POST":
         name = request.form["name"]
@@ -146,18 +177,25 @@ def edit_destination(destination_id):
             return redirect(f"/destination/{destination_id}/edit")
 
         try:
-            destinations.update_destination(destination_id, name, description, municipality, classifications_selected)
+            destinations.update_destination(
+                destination_id,
+                name,
+                description,
+                municipality,
+                classifications_selected,
+            )
             flash("Retkipaikka päivitetty.")
             return redirect(f"/destination/{destination_id}")
         except Exception as e:
             flash("Virhe retkipaikan päivityksessä.", "error")
             return redirect(f"/destination/{destination_id}/edit")
 
+
 @app.route("/destination/<int:destination_id>/delete", methods=["GET", "POST"])
 def delete_destination(destination_id):
     require_login()
     destination = destinations.get_destination_by_id(destination_id)
-    if not destination or destination['user_id'] != session["user_id"]:
+    if not destination or destination["user_id"] != session["user_id"]:
         abort(403)
 
     if request.method == "GET":
@@ -171,6 +209,7 @@ def delete_destination(destination_id):
         except Exception as e:
             flash("Virhe retkipaikan poistamisessa.", "error")
             return redirect(f"/destination/{destination_id}")
+
 
 @app.errorhandler(404)
 def page_not_found(e):

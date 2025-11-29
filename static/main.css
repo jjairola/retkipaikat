@@ -46,6 +46,10 @@ input::file-selector-button {
     text-decoration: none;
 }
 
+form .error {
+    color: red;
+}
+
 button:hover,
 .button:hover,
 input[type="submit"]:hover {
