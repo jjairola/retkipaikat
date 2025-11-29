@@ -119,11 +119,10 @@ def register():
         try:
             users.create_user(validated["username"], validated["password1"])
             flash("Käyttäjätili luotu. Voit kirjautua sisään!")
+            return redirect("/login")
         except users.UserError:
             flash("Rekisteröityinen ei kelpaava.", "error")
             return redirect("/register")
-
-        return redirect("/")
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -240,6 +239,11 @@ def delete_destination(destination_id):
             flash("Virhe retkipaikan poistamisessa.", "error")
             return redirect(f"/destination/{destination_id}")
 
+@app.route("/profile")
+def profile():
+    require_login()
+    user_destinations = destinations.get_destinations_by_user(session["user_id"])
+    return render_template("profile.html", destinations=user_destinations)
 
 @app.errorhandler(404)
 def page_not_found(e):

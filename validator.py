@@ -8,7 +8,7 @@ def is_number(value):
 
 validators = {
     "min": [lambda value, param, dto: len(value) >= param, "{} on liian lyhyt."],
-    "maxh": [lambda value, param, dto: len(value) <= param, "{} on liian pitkä."],
+    "max": [lambda value, param, dto: len(value) <= param, "{} on liian pitkä."],
     "number": [
         lambda value, param, dto: is_number(value) == param,
         "{} pitää olla numero.",

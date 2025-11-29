@@ -21,6 +21,17 @@ def get_all_classifications():
     sql = "SELECT id, name FROM classifications ORDER BY name"
     return db.query(sql)
 
+def get_destinations_by_user(user_id):
+    sql = """
+    SELECT d.id, d.name, d.description, d.municipality, GROUP_CONCAT(c.name) as classifications
+    FROM destinations d
+    LEFT JOIN destination_classifications dc ON d.id = dc.destination_id
+    LEFT JOIN classifications c ON dc.classification_id = c.id
+    WHERE d.user_id = ?
+    GROUP BY d.id
+    ORDER BY d.id
+    """
+    return db.query(sql, [user_id])
 
 def get_destinations():
     sql = """
