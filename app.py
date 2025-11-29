@@ -1,3 +1,5 @@
+from os import error
+import re
 from flask import Flask, abort
 from flask import flash, redirect, render_template, request, session
 import secrets
@@ -113,16 +115,24 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
-        return render_template("login.html")
+        form_data, errors = session_utils.get_form_and_errors()
+        return render_template("login.html", form_data=form_data, errors=errors)
 
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
+        schema = {
+            "username": {"is_required": True, "translation": "Käyttäjätunnus"},
+            "password": {"is_required": True, "translation": "Salasana"},
+        }
+        validated, errors = validator.validator(request.form, schema)
+        if errors:
+            flash("Lomakkeen tiedot eivät kelpaa", "error")
+            session_utils.set_form_and_errors(validated, errors)
+            return redirect("/login")
 
-        user_id = users.check_login(username, password)
+        user_id = users.check_login(validated["username"], validated["password"])
         if user_id:
             session["user_id"] = user_id
-            session["username"] = username
+            session["username"] = validated["username"]
             session["csrf_token"] = secrets.token_hex(16)
             flash("Kirjautuminen onnistui.")
             return redirect("/")

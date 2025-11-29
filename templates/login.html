@@ -9,10 +9,16 @@
   <p>
     <label for="username">Tunnus</label>
     <input type="text" name="username" id="username" />
+    {% if errors and errors.username %}
+    <span class="error">{{ errors.username }}</span>
+    {% endif %}
   </p>
   <p>
     <label for="password">Salasana</label>
     <input type="password" name="password" id="password" />
+    {% if errors and errors.password %}
+    <span class="error">{{ errors.password }}</span>
+    {% endif %}
   </p>
   <input type="submit" value="Kirjaudu" />
 </form>
