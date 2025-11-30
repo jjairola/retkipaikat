@@ -1,22 +1,23 @@
 <form action="{{ action_url }}" method="post">
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     <div>
-        <label>Nimi</label>
-        <input type="text" name="name" value="{{ destination.name if destination else '' }}" maxlength="50" required>
+        <label for="name">Nimi</label>
+        <input id="name" type="text" name="name" value="{{ destination.name if destination else '' }}" maxlength="50"
+            required>
     </div>
     <div>
-        <label>Kuvaus</label>
-        <textarea name="description" rows="4" cols="50" maxlength="1000"
+        <label for="description">Kuvaus</label>
+        <textarea id="description" name="description" rows="4" cols="50" maxlength="1000"
             required>{{ destination.description if destination else '' }}</textarea>
     </div>
     <div>
-        <label>Kunta</label>
-        <input type="text" name="municipality" value="{{ destination.municipality if destination else '' }}"
-            maxlength="50" required>
+        <label for="municipality">Kunta</label>
+        <input id="municipality" type="text" name="municipality"
+            value="{{ destination.municipality if destination else '' }}" maxlength="50" required>
     </div>
     <div>
-        <label>Luokitukset</label>
-        <select multiple name="classifications">
+        <label for="classifications">Luokitukset</label>
+        <select multiple id="classifications" name="classifications">
             {% for classification in classifications %}
             <option value="{{ classification.id }}" {% if current_classifications and classification.id in
                 current_classifications %}selected{% endif %}>{{ classification.name }}</option>
