@@ -176,6 +176,7 @@ def register():
             "translation": "Käyttäjätunnus",
             "min": 5,
             "max": 20,
+            "word_count": 1,
         },
         "password1": {"required": True, "translation": "Salasana", "min": 8, "max": 20},
         "password2": {
@@ -220,6 +221,7 @@ def login():
             "translation": "Käyttäjätunnus",
             "min": 5,
             "max": 20,
+            "word_count": 1,
         },
         "password": {
             "required": True,
