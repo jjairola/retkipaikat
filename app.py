@@ -88,6 +88,78 @@ def find_destination():
     )
 
 
+@app.route("/destination/<int:destination_id>")
+def destination_page(destination_id):
+    destination = destinations.get_destination_by_id(destination_id)
+    if not destination:
+        abort(404)
+    return render_template("destination.html", destination=destination)
+
+
+@app.route("/destination/<int:destination_id>/edit", methods=["GET", "POST"])
+def edit_destination(destination_id):
+    require_login()
+    destination = destinations.get_destination_by_id(destination_id)
+    if not destination or destination["user_id"] != session["user_id"]:
+        abort(403)
+
+    if request.method == "GET":
+        classifications = destinations.get_all_classifications()
+        current_classifications = destinations.get_destination_classifications_ids(
+            destination_id
+        )
+        return render_template(
+            "edit_destination.html",
+            destination=destination,
+            classifications=classifications,
+            current_classifications=current_classifications,
+        )
+
+    if request.method == "POST":
+        name = request.form["name"]
+        description = request.form["description"]
+        municipality = request.form["municipality"]
+        classifications_selected = request.form.getlist("classifications")
+
+        if not name or not description or not municipality:
+            flash("Kaikki kentät ovat pakollisia.", "error")
+            return redirect(f"/destination/{destination_id}/edit")
+
+        try:
+            destinations.update_destination(
+                destination_id,
+                name,
+                description,
+                municipality,
+                classifications_selected,
+            )
+            flash("Retkipaikka päivitetty.")
+            return redirect(f"/destination/{destination_id}")
+        except Exception as e:
+            flash("Virhe retkipaikan päivityksessä.", "error")
+            return redirect(f"/destination/{destination_id}/edit")
+
+
+@app.route("/destination/<int:destination_id>/delete", methods=["GET", "POST"])
+def delete_destination(destination_id):
+    require_login()
+    destination = destinations.get_destination_by_id(destination_id)
+    if not destination or destination["user_id"] != session["user_id"]:
+        abort(403)
+
+    if request.method == "GET":
+        return render_template("delete_destination.html", destination=destination)
+
+    if request.method == "POST":
+        try:
+            destinations.delete_destination(destination_id)
+            flash("Retkipaikka poistettu.")
+            return redirect("/")
+        except Exception as e:
+            flash("Virhe retkipaikan poistamisessa.", "error")
+            return redirect(f"/destination/{destination_id}")
+
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     schema = {
@@ -168,82 +240,12 @@ def logout():
     return redirect("/")
 
 
-@app.route("/destination/<int:destination_id>")
-def destination_page(destination_id):
-    destination = destinations.get_destination_by_id(destination_id)
-    if not destination:
-        abort(404)
-    return render_template("destination.html", destination=destination)
-
-
-@app.route("/destination/<int:destination_id>/edit", methods=["GET", "POST"])
-def edit_destination(destination_id):
-    require_login()
-    destination = destinations.get_destination_by_id(destination_id)
-    if not destination or destination["user_id"] != session["user_id"]:
-        abort(403)
-
-    if request.method == "GET":
-        classifications = destinations.get_all_classifications()
-        current_classifications = destinations.get_destination_classifications_ids(
-            destination_id
-        )
-        return render_template(
-            "edit_destination.html",
-            destination=destination,
-            classifications=classifications,
-            current_classifications=current_classifications,
-        )
-
-    if request.method == "POST":
-        name = request.form["name"]
-        description = request.form["description"]
-        municipality = request.form["municipality"]
-        classifications_selected = request.form.getlist("classifications")
-
-        if not name or not description or not municipality:
-            flash("Kaikki kentät ovat pakollisia.", "error")
-            return redirect(f"/destination/{destination_id}/edit")
-
-        try:
-            destinations.update_destination(
-                destination_id,
-                name,
-                description,
-                municipality,
-                classifications_selected,
-            )
-            flash("Retkipaikka päivitetty.")
-            return redirect(f"/destination/{destination_id}")
-        except Exception as e:
-            flash("Virhe retkipaikan päivityksessä.", "error")
-            return redirect(f"/destination/{destination_id}/edit")
-
-
-@app.route("/destination/<int:destination_id>/delete", methods=["GET", "POST"])
-def delete_destination(destination_id):
-    require_login()
-    destination = destinations.get_destination_by_id(destination_id)
-    if not destination or destination["user_id"] != session["user_id"]:
-        abort(403)
-
-    if request.method == "GET":
-        return render_template("delete_destination.html", destination=destination)
-
-    if request.method == "POST":
-        try:
-            destinations.delete_destination(destination_id)
-            flash("Retkipaikka poistettu.")
-            return redirect("/")
-        except Exception as e:
-            flash("Virhe retkipaikan poistamisessa.", "error")
-            return redirect(f"/destination/{destination_id}")
-
 @app.route("/profile")
 def profile():
     require_login()
     user_destinations = destinations.get_destinations_by_user(session["user_id"])
     return render_template("profile.html", destinations=user_destinations)
+
 
 @app.errorhandler(404)
 def page_not_found(e):
