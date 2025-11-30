@@ -8,17 +8,11 @@
 <form action="/login" method="post">
   <p>
     <label for="username">Tunnus</label>
-    <input type="text" name="username" id="username" {{ schema.username }} />
-    {% if errors and errors.username %}
-    <span class="error">{{ errors.username }}</span>
-    {% endif %}
+    <input type="text" name="username" id="username" required minlength="5" maxlength="20" />
   </p>
   <p>
     <label for="password">Salasana</label>
-    <input type="password" name="password" id="password" {{ schema.password }} />
-    {% if errors and errors.password %}
-    <span class="error">{{ errors.password }}</span>
-    {% endif %}
+    <input type="password" name="password" id="password" required minlength="8" maxlength="20" />
   </p>
   <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
   <input type="submit" value="Kirjaudu" />

@@ -1,17 +1,16 @@
-<form action="{{ action_url }}" method="post">
+<form class="mb-4" action="{{ action_url }}" method="post">
     <div>
         <label for="name">Nimi</label>
-        <input id="name" type="text" name="name" value="{{ form_data.name }}" {{ schema.name }} />
+        <input id="name" type="text" name="name" value="{{ destination.name }}" />
     </div>
     <div>
         <label for="description">Kuvaus</label>
-        <textarea id="description" name="description" rows="4" cols="50" maxlength="1000" {{ schema.description
-            }}>{{ form_data.description }}</textarea>
+        <textarea id="description" name="description" rows="4" cols="50"
+            maxlength="1000">{{ destination.description }}</textarea>
     </div>
     <div>
         <label for="municipality">Kunta</label>
-        <input id="municipality" type="text" name="municipality" value="{{ form_data.municipality }}" {{
-            schema.municipality }} />
+        <input id="municipality" type="text" name="municipality" value="{{ destination.municipality }}" />
     </div>
     <div>
         {% for class in classes %}
@@ -20,10 +19,10 @@
             <select name="classes" id="class{{ class }}">
                 <option value="">(valitse)</option>
                 {% for option in classes[class] %}
-                {% if False %}
+                {% if current_classes.get(class) == option %}
                 <option value="{{ class }}:{{ option }}" selected>{{ option }}</option>
                 {% else %}
-                {{ form_data.classes }}
+                {{ destination.classes }}
                 <option value="{{ class }}:{{ option }}">{{ option }}</option>
                 {% endif %}
                 {% endfor %}

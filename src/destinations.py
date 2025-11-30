@@ -109,11 +109,7 @@ def get_destinations_by_class(title, value):
 
 def get_destination_classes(destination_id):
     sql = "SELECT title, value FROM destination_classes WHERE destination_id = ?"
-    result = db.query(sql, [destination_id])
-    classes = {}
-    for title, value in result:
-        classes[title] = value
-    return classes
+    return dict(db.query(sql, [destination_id]))
 
 
 def get_destination_classifications_ids(destination_id):

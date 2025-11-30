@@ -38,11 +38,12 @@
 
 {% if session.user_id %}
 <h3>Uusi kommentti</h3>
-<form action="/create_comment" method="post">
+<form class="mb-4" action="/create-comment" method="post">
     <label for="comment">Kommentti</label>
-    <textarea name="comment" id="comment" required></textarea><br>
+    <textarea name="comment" id="comment" required maxlength="500" required></textarea>
+    <br>
     <label for="rating">Arvosana (1-5)</label>
-    <input type="number" name="rating" id="rating" min="1" max="5" /><br>
+    <input type="number" name="rating" id="rating" min="1" max="5" required /><br>
     <input type="hidden" name="destination_id" value="{{ destination.id }}">
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <input type="submit" value="Lähetä" />

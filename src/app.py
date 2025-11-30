@@ -5,9 +5,6 @@ import config
 import users
 import destinations
 import comments
-import validator
-import session_utils
-
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -76,55 +73,50 @@ def destination_page(destination_id):
 def add_destination():
     require_login()
     all_classes = destinations.get_all_classes()
-    schema = {
-        "name": {"required": True, "translation": "Nimi", "min": 10, "max": 50},
-        "description": {"required": True, "translation": "Kuvaus", "max": 1000},
-        "municipality": {
-            "required": True,
-            "translation": "Kunta",
-        },
-        "classes": {
-            "require": {
-                "required_types": ["Tyyppi", "Vaikeusaste"],
-                "all_classes": all_classes,
-            }
-        },
-    }
 
     if request.method == "GET":
-        form_data, errors = session_utils.get_form_and_errors()
-
         return render_template(
             "add_destination.html",
             classes=all_classes,
-            form_data=form_data,
-            errors=errors,
-            schema=validator.schema_to_input(schema),
+            destination=None,
+            current_classes={},
         )
 
     if request.method == "POST":
         check_csrf()
 
-        print("Adding destination with data:", request.form)
-
-        validated, errors = validator.validator(request.form, schema)
-        if errors:
-            print("errors")
-            print(errors)
-            flash("Lomakkeen tiedot eivät kelpaa", "error")
-            session_utils.set_form_and_errors(validated, errors)
+        name = request.form.get("name")
+        if not name or len(name) < 5 or len(name) > 80:
+            flash("Nimen pitää olla 5-80 merkkiä pitkä.", "error")
             return redirect("/add-destination")
 
-        print("validated")
-        print(validated)
+        description = request.form.get("description")
+        if not description or len(description) < 10 or len(description) > 500:
+            flash("Kuvauksen pitää olla 10-500 merkkiä pitkä.", "error")
+            return redirect("/add-destination")
+
+        municipality = request.form.get("municipality")
+        if not municipality:
+            flash("Paikkakunta ei voi olla tyhjä.", "error")
+            return redirect("/add-destination")
+
+        classes = []
+        for entry in request.form.getlist("classes"):
+            if entry:
+                class_title, class_value = entry.split(":")
+                if class_title not in all_classes:
+                    abort(403)
+                if class_value not in all_classes[class_title]:
+                    abort(403)
+                classes.append((class_title, class_value))
 
         try:
             destinations.add_destination(
-                validated["name"],
-                validated["description"],
-                validated["municipality"],
+                name,
+                description,
+                municipality,
                 session["user_id"],
-                validated["classes"],
+                classes,
             )
             flash("Retkipaikka lisätty onnistuneesti.")
             return redirect("/")
@@ -143,20 +135,6 @@ def edit_destination(destination_id):
         abort(403)
 
     all_classes = destinations.get_all_classes()
-    schema = {
-        "name": {"required": True, "translation": "Nimi", "min": 10, "max": 50},
-        "description": {"required": True, "translation": "Kuvaus", "max": 1000},
-        "municipality": {
-            "required": True,
-            "translation": "Kunta",
-        },
-        "classes": {
-            "require": {
-                "required_types": ["Tyyppi", "Vaikeusaste"],
-                "all_classes": all_classes,
-            }
-        },
-    }
 
     if request.method == "GET":
         current_classes = destinations.get_destination_classes(destination_id)
@@ -164,32 +142,34 @@ def edit_destination(destination_id):
         return render_template(
             "edit_destination.html",
             classes=all_classes,
-            form_data=destination,
-            schema=validator.schema_to_input(schema),
+            destination=destination,
             current_classes=current_classes,
         )
 
     if request.method == "POST":
         check_csrf()
-        validated, errors = validator.validator(request.form, schema)
 
-        print("error")
-        print(errors)
-        print("validated")
-        print(validated)
+        name = request.form.get("name")
+        description = request.form.get("description")
+        municipality = request.form.get("municipality")
 
-        if errors:
-            flash("Lomakkeen tiedot eivät kelpaa", "error")
-            session_utils.set_form_and_errors(validated, errors)
-            return redirect(f"/destination/{destination_id}/edit")
+        classes = []
+        for entry in request.form.getlist("classes"):
+            if entry:
+                class_title, class_value = entry.split(":")
+                if class_title not in all_classes:
+                    abort(403)
+                if class_value not in all_classes[class_title]:
+                    abort(403)
+                classes.append((class_title, class_value))
 
         try:
             destinations.update_destination(
                 destination_id,
-                validated["name"],
-                validated["description"],
-                validated["municipality"],
-                validated["classes"],
+                name,
+                description,
+                municipality,
+                classes,
             )
             flash("Retkipaikka päivitetty.")
             return redirect(f"/destination/{destination_id}")
@@ -221,41 +201,28 @@ def delete_destination(destination_id):
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    schema = {
-        "username": {
-            "required": True,
-            "translation": "Käyttäjätunnus",
-            "min": 5,
-            "max": 20,
-            "word_count": 1,
-        },
-        "password1": {"required": True, "translation": "Salasana", "min": 8, "max": 20},
-        "password2": {
-            "required": True,
-            "translation": "Vahvista salasana",
-            "min": 8,
-            "max": 20,
-            "equals": "password1",
-        },
-    }
     if request.method == "GET":
-        form_data, errors = session_utils.get_form_and_errors()
-        return render_template(
-            "register.html",
-            form_data=form_data,
-            errors=errors,
-            schema=validator.schema_to_input(schema),
-        )
+        return render_template("register.html")
 
     if request.method == "POST":
-        validated, errors = validator.validator(request.form, schema)
-        if errors:
-            flash("Lomakkeen tiedot eivät kelpaa", "error")
-            session_utils.set_form_and_errors(validated, errors)
+        username = request.form.get("username")
+        password1 = request.form.get("password1")
+        password2 = request.form.get("password2")
+
+        if password1 != password2:
+            flash("Salasanat eivät täsmää.", "error")
+            return redirect("/register")
+
+        if len(username) < 5 or len(username) > 20:
+            flash("Käyttäjätunnuksen oltava 5-20 merkkiä pitkä.", "error")
+            return redirect("/register")
+
+        if len(password1) < 8 or len(password1) > 20:
+            flash("Salasanan oltava 8-20 merkkiä pitkä.", "error")
             return redirect("/register")
 
         try:
-            users.create_user(validated["username"], validated["password1"])
+            users.create_user(username, password1)
             flash("Käyttäjätili luotu. Voit kirjautua sisään!")
             return redirect("/login")
 
@@ -266,42 +233,17 @@ def register():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    schema = {
-        "username": {
-            "required": True,
-            "translation": "Käyttäjätunnus",
-            "min": 5,
-            "max": 20,
-            "word_count": 1,
-        },
-        "password": {
-            "required": True,
-            "translation": "Salasana",
-            "min": 8,
-            "max": 20,
-        },
-    }
-
     if request.method == "GET":
-        form_data, errors = session_utils.get_form_and_errors()
-        return render_template(
-            "login.html",
-            form_data=form_data,
-            errors=errors,
-            schema=validator.schema_to_input(schema),
-        )
+        return render_template("login.html")
 
     if request.method == "POST":
-        validated, errors = validator.validator(request.form, schema)
-        if errors:
-            flash("Lomakkeen tiedot eivät kelpaa", "error")
-            session_utils.set_form_and_errors(validated, errors)
-            return redirect("/login")
+        username = request.form.get("username")
+        password = request.form.get("password")
 
-        user_id = users.check_login(validated["username"], validated["password"])
+        user_id = users.check_login(username, password)
         if user_id:
             session["user_id"] = user_id
-            session["username"] = validated["username"]
+            session["username"] = username
             session["csrf_token"] = secrets.token_hex(16)
             flash("Kirjautuminen onnistui.")
             return redirect("/profile")
@@ -318,30 +260,29 @@ def logout():
     return redirect("/")
 
 
-@app.route("/create_comment", methods=["POST"])
+@app.route("/create-comment", methods=["POST"])
 def create_comment():
     require_login()
     check_csrf()
 
     destination_id = request.form.get("destination_id")
+    comment = request.form.get("comment")
+    rating = request.form.get("rating")
 
-    schema = {
-        "comment": {"required": True, "translation": "Kommentti", "max": 1000},
-        "rating": {"required": True, "translation": "Arvostelu", "min": 1, "max": 5},
-        "destination_id": {"required": True},
-    }
-
-    validated, errors = validator.validator(request.form, schema)
-    if errors:
-        flash("Virhe kommentissa", "error")
-        return redirect(f"/destination/{validated['destination_id']}")
+    if not comment or len(comment) < 1 or len(comment) > 500:
+        flash("Kommentin pitää olla 1-500 merkkiä pitkä.", "error")
+        return redirect(f"/destination/{destination_id}")
+    
+    if not rating or int(rating) < 1 or int(rating) > 5:
+        flash("Arvion pitää olla välillä 1-5.", "error")
+        return redirect(f"/destination/{destination_id}")
 
     try:
         comments.add_comment(
-            int(validated["destination_id"]),
+            destination_id,
             session["user_id"],
-            validated["comment"],
-            validated["rating"],
+            comment,
+            rating,
         )
         flash("Kommentti lisätty.")
     except Exception as e:

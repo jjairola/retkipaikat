@@ -1,2 +1,5 @@
 TODO.md
 database.db
+__pycache__/
+.venv/
+venv/

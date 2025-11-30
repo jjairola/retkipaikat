@@ -8,24 +8,15 @@
 <form action="/register" method="post">
   <p>
     <label for="username">Tunnus</label>
-    <input type="text" name="username" id="username" value="{{ form_data.username }}" {{ schema.username }} />
-    {% if errors and errors.username %}
-    <span class="error">{{ errors.username }}</span>
-    {% endif %}
+    <input type="text" name="username" id="username" minlength="5" maxlength="20" required />
   </p>
   <p>
     <label for="password1">Salasana</label>
-    <input type="password" name="password1" id="password1" {{ schema.password1 }} />
-    {% if errors and errors.password1 %}
-    <span class="error">{{ errors.password1 }}</span>
-    {% endif %}
+    <input type="password" name="password1" id="password1" minlength="8" maxlength="20" required />
   </p>
   <p>
     <label for="password2">Salasana uudestaan</label>
-    <input type="password" name="password2" id="password2" {{ schema.password2 }} />
-    {% if errors and errors.password2 %}
-    <span class="error">{{ errors.password2 }}</span>
-    {% endif %}
+    <input type="password" name="password2" id="password2" minlength="8" maxlength="20" required />
   </p>
   <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
   <input type="submit" value="Luo tunnus" />
