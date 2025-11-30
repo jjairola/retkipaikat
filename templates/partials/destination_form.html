@@ -6,19 +6,24 @@
     </div>
     <div>
         <label>Kuvaus</label>
-        <textarea name="description" rows="4" cols="50" maxlength="1000" required>{{ destination.description if destination else '' }}</textarea>
+        <textarea name="description" rows="4" cols="50" maxlength="1000"
+            required>{{ destination.description if destination else '' }}</textarea>
     </div>
     <div>
         <label>Kunta</label>
-        <input type="text" name="municipality" value="{{ destination.municipality if destination else '' }}" maxlength="50" required>
+        <input type="text" name="municipality" value="{{ destination.municipality if destination else '' }}"
+            maxlength="50" required>
     </div>
     <div>
         <label>Luokitukset</label>
         <select multiple name="classifications">
             {% for classification in classifications %}
-            <option value="{{ classification.id }}" {% if current_classifications and classification.id in current_classifications %}selected{% endif %}>{{ classification.name }}</option>
+            <option value="{{ classification.id }}" {% if current_classifications and classification.id in
+                current_classifications %}selected{% endif %}>{{ classification.name }}</option>
             {% endfor %}
         </select>
     </div>
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+
     <input type="submit" value="{{ submit_text }}">
 </form>

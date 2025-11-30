@@ -18,54 +18,15 @@ def require_login():
         abort(403)
 
 
+def check_csrf():
+    if request.form["csrf_token"] != session["csrf_token"]:
+        abort(403)
+
+
 @app.route("/")
 def index():
     destinations_list = destinations.get_destinations()
     return render_template("index.html", destinations=destinations_list)
-
-
-@app.route("/add-destination", methods=["GET", "POST"])
-def add_destination():
-    require_login()
-
-    if request.method == "GET":
-        form_data, errors = session_utils.get_form_and_errors()
-        classifications = destinations.get_all_classifications()
-        return render_template(
-            "add_destination.html",
-            classifications=classifications,
-            form_data=form_data,
-            errors=errors,
-        )
-
-    if request.method == "POST":
-        schema = {
-            "name": {"required": True, "translation": "Nimi"},
-            "description": {"required": True, "translation": "Kuvaus"},
-            "municipality": {"required": True, "translation": "Kunta"},
-        }
-        validated, errors = validator.validator(request.form, schema)
-        if errors:
-            session_utils.set_form_and_errors(validated, errors)
-            return redirect("/add-destination")
-
-        # TODO
-        classification_ids = request.form.getlist("classifications")
-
-        try:
-            destinations.add_destination(
-                validated["name"],
-                validated["description"],
-                validated["municipality"],
-                session["user_id"],
-                classification_ids,
-            )
-            flash("Retkipaikka lisätty onnistuneesti.")
-            return redirect("/")
-        except Exception as e:
-            print(e)
-            flash("Virhe retkipaikan lisäämisessä.", "error")
-            return redirect("/add-destination")
 
 
 @app.route("/find-destination")
@@ -96,6 +57,54 @@ def destination_page(destination_id):
     return render_template("destination.html", destination=destination)
 
 
+@app.route("/add-destination", methods=["GET", "POST"])
+def add_destination():
+    require_login()
+
+    schema = {
+        "name": {"required": True, "translation": "Nimi"},
+        "description": {"required": True, "translation": "Kuvaus"},
+        "municipality": {"required": True, "translation": "Kunta"},
+    }
+
+    if request.method == "GET":
+        form_data, errors = session_utils.get_form_and_errors()
+        classifications = destinations.get_all_classifications()
+        return render_template(
+            "add_destination.html",
+            classifications=classifications,
+            form_data=form_data,
+            errors=errors,
+            schema=validator.schema_to_input(schema),
+        )
+
+    if request.method == "POST":
+        check_csrf()
+
+        validated, errors = validator.validator(request.form, schema)
+        if errors:
+            session_utils.set_form_and_errors(validated, errors)
+            return redirect("/add-destination")
+
+        # TODO
+        classification_ids = request.form.getlist("classifications")
+
+        try:
+            destinations.add_destination(
+                validated["name"],
+                validated["description"],
+                validated["municipality"],
+                session["user_id"],
+                classification_ids,
+            )
+            flash("Retkipaikka lisätty onnistuneesti.")
+            return redirect("/")
+        except Exception as e:
+            print(e)
+            flash("Virhe retkipaikan lisäämisessä.", "error")
+            return redirect("/add-destination")
+
+
 @app.route("/destination/<int:destination_id>/edit", methods=["GET", "POST"])
 def edit_destination(destination_id):
     require_login()
@@ -116,6 +125,7 @@ def edit_destination(destination_id):
         )
 
     if request.method == "POST":
+        check_csrf()
         name = request.form["name"]
         description = request.form["description"]
         municipality = request.form["municipality"]
@@ -169,8 +179,14 @@ def register():
             "min": 5,
             "max": 20,
         },
-        "password1": {"required": True, "translation": "Salasana", "min": 8},
-        "password2": {"required": True, "translation": "Vahvista salasana", "min": 8},
+        "password1": {"required": True, "translation": "Salasana", "min": 8, "max": 20},
+        "password2": {
+            "required": True,
+            "translation": "Vahvista salasana",
+            "min": 8,
+            "max": 20,
+            "equals": "password1",
+        },
     }
     if request.method == "GET":
         form_data, errors = session_utils.get_form_and_errors()
@@ -192,16 +208,27 @@ def register():
             users.create_user(validated["username"], validated["password1"])
             flash("Käyttäjätili luotu. Voit kirjautua sisään!")
             return redirect("/login")
+
         except users.UserError:
-            flash("Rekisteröityinen ei kelpaava.", "error")
+            flash("Rekisteröitymisessä tapahtui virhe.", "error")
             return redirect("/register")
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     schema = {
-        "username": {"required": True, "translation": "Käyttäjätunnus"},
-        "password": {"required": True, "translation": "Salasana"},
+        "username": {
+            "required": True,
+            "translation": "Käyttäjätunnus",
+            "min": 5,
+            "max": 20,
+        },
+        "password": {
+            "required": True,
+            "translation": "Salasana",
+            "min": 8,
+            "max": 20,
+        },
     }
 
     if request.method == "GET":
@@ -226,7 +253,7 @@ def login():
             session["username"] = validated["username"]
             session["csrf_token"] = secrets.token_hex(16)
             flash("Kirjautuminen onnistui.")
-            return redirect("/")
+            return redirect("/profile")
         else:
             flash("Väärä tunnus tai salasana", "error")
             return redirect("/login")
