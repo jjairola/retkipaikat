@@ -14,7 +14,7 @@ Tässä pääasiallinen tietokohde on retkipaikka ja toissijainen tietokohde on 
 
 ## Sovelluksen asennus
 
-A. Kurssin suositustapa.
+### Kurssin esimerkkisuositustapaa noudattava:
 
 Asenna `flask`-kirjasto.
 
@@ -32,6 +32,7 @@ sqlite3 database.db < init.sql
 Käynnistä ohjelma:
 
 ```
+$ cd src
 $ flask run
 ```
 
@@ -40,11 +41,11 @@ Mene selaimella http://localhost:5000
 B. Koko kehitysympäristö pylint + black +penv
 
 
-## Ohjelman suoritus
+### Python env
 
 Ohjeet (Mac/Linux):
 
-```bash
+```
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
