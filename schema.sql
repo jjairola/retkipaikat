@@ -1,6 +1,6 @@
 CREATE TABLE users (
     id INTEGER PRIMARY KEY,
-    username TEXT UNIQUE,
+    username TEXT UNIQUE
     password_hash TEXT
 );
 
@@ -24,3 +24,11 @@ CREATE TABLE destination_classifications (
     UNIQUE(destination_id, classification_id)
 );
 
+CREATE TABLE comments (
+    id INTEGER PRIMARY KEY,
+    destination_id INTEGER REFERENCES destinations,
+    user_id INTEGER REFERENCES users,
+    comment TEXT,
+    rating INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
