@@ -3,13 +3,19 @@
         <img src="/static/placeholder.png" alt="{{ destination.name }}" class="w-full h-auto rounded">
     </div>
     <div class="flex-1">
-        <h3><a href="/destination/{{ destination.id }}" class="text-blue-600 hover:underline">{{ destination.name }} </a> Arvosana: {{ destination.average_rating }}
+        <h3><a href="/destination/{{ destination.id }}" class="text-blue-600 hover:underline">{{ destination.name }}
+            </a>
+            {% if destination.average_rating %}
+            <span class="list-rating">
+            - keskiarvo: {{ destination.average_rating }}
+            </span>
+            {% endif %}
         </h3>
         <p>{{ destination.description }}</p>
         {% if destination.classes %}
         <div class="flex flex-wrap">
             {% for class_title, class_value in destination.classes.items() %}
-                <span class="pill">{{ class_title }}: {{ class_value }}</span>
+            <span class="pill">{{ class_title }}: {{ class_value }}</span>
             {% endfor %}
         </div>
         {% endif %}

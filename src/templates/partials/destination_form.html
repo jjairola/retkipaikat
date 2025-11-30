@@ -1,22 +1,23 @@
 <form class="mb-4" action="{{ action_url }}" method="post">
     <div>
         <label for="name">Nimi</label>
-        <input id="name" type="text" name="name" value="{{ destination.name }}" />
+        <input id="name" type="text" name="name" value="{{ destination.name }}" required minlength="5" maxlength="80" />
     </div>
     <div>
         <label for="description">Kuvaus</label>
-        <textarea id="description" name="description" rows="4" cols="50"
-            maxlength="1000">{{ destination.description }}</textarea>
+        <textarea id="description" name="description" rows="4" cols="50" minlength="10" maxlength="1000"
+            required>{{ destination.description }}</textarea>
     </div>
     <div>
         <label for="municipality">Kunta</label>
-        <input id="municipality" type="text" name="municipality" value="{{ destination.municipality }}" />
+        <input id="municipality" type="text" name="municipality" value="{{ destination.municipality }}" required
+            minlength="5" maxlength="80" />
     </div>
     <div>
         {% for class in classes %}
         <p>
             <label for="class{{ class }}">{{ class }}</label>
-            <select name="classes" id="class{{ class }}">
+            <select name="classes" id="class{{ class }}" required>
                 <option value="">(valitse)</option>
                 {% for option in classes[class] %}
                 {% if current_classes.get(class) == option %}

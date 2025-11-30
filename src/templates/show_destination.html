@@ -11,9 +11,9 @@
         <img src="/static/placeholder.png" alt="{{ destination.name }}">
     </div>
     <div>
-        <p><strong>Kuvaus:</strong> {{ destination.description }}</p>
-        <p><strong>Kunta:</strong> {{ destination.municipality }}</p>
-        <p><strong>Lisännyt:</strong> {{ destination.username }}</p>
+        <p><strong>Kuvaus</strong><br />{{ destination.description | show_lines}}</p>
+        <p><strong>Kunta</strong> {{ destination.municipality }}</p>
+        <p><strong>Lisännyt</strong> {{ destination.username }}</p>
 
         {% for title, value in classes.items() %}
         <p><strong>{{ title }}:</strong> {{ value }}</p>
