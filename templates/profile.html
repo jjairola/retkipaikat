@@ -6,16 +6,19 @@
 <h2>Profiili</h2>
 
 <h3>Omat retkipaikat</h3>
+<p>
+    Käyttäjällä on yhteensä {{ destinations | count }} retkipaikkaa.
+</p>
 {% if destinations %}
-    <ul>
+<ul>
     {% for destination in destinations %}
-        <li>
-            <a href="">{{ destination.name }}</a>
-        </li>
+    <li>
+        <a href="/destination/{{ destination.id }}">{{ destination.name }}</a>
+    </li>
     {% endfor %}
-    </ul>
+</ul>
 {% else %}
-    <p>Sinulla ei ole vielä lisättyjä retkipaikkoja.</p>
+<p>Sinulla ei ole vielä lisättyjä retkipaikkoja.</p>
 {% endif %}
 
 {% endblock %}
