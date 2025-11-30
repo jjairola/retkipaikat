@@ -1,6 +1,6 @@
 CREATE TABLE users (
     id INTEGER PRIMARY KEY,
-    username TEXT UNIQUE
+    username TEXT UNIQUE,
     password_hash TEXT
 );
 
@@ -12,16 +12,18 @@ CREATE TABLE destinations (
     user_id INTEGER REFERENCES users
 );
 
-CREATE TABLE classifications (
+
+CREATE TABLE classes (
     id INTEGER PRIMARY KEY,
-    name TEXT
+    title TEXT,
+    value TEXT
 );
 
-CREATE TABLE destination_classifications (
+CREATE TABLE destination_classes (
     id INTEGER PRIMARY KEY,
     destination_id INTEGER REFERENCES destinations,
-    classification_id INTEGER REFERENCES classifications,
-    UNIQUE(destination_id, classification_id)
+    title TEXT,
+    value TEXT
 );
 
 CREATE TABLE comments (

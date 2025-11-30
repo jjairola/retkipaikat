@@ -1,59 +1,75 @@
 import db
 
+
 class DestinationError(Exception):
     pass
 
-def add_destination(name, description, municipality, user_id, classification_ids):
+
+def get_all_classes():
+    sql = "SELECT title, value FROM classes ORDER BY id"
+    result = db.query(sql)
+
+    classes = {}
+    for title, value in result:
+        classes[title] = []
+    for title, value in result:
+        classes[title].append(value)
+
+    return classes
+
+
+def add_comment(destination_id, user_id, comment, rating):
+    sql = """INSERT INTO comments (destination_id, user_id, comment, rating)
+             VALUES (?, ?, ?, ?)"""
+    db.execute(sql, [destination_id, user_id, comment, rating])
+
+
+def get_comments(destination_id):
+    sql = """SELECT comments.comment, comments.rating, users.id user_id, users.username
+             FROM comments, users
+             WHERE comments.destination_id = ? AND comments.user_id = users.id
+             ORDER BY comments.id DESC"""
+    return db.query(sql, [destination_id])
+
+
+def add_destination(name, description, municipality, user_id, classes):
     sql = """INSERT INTO destinations (name, description, municipality, user_id)
              VALUES (?, ?, ?, ?)"""
     db.execute(sql, [name, description, municipality, user_id])
 
     destination_id = db.last_insert_id()
 
-    # TODO: Refactor
-    if classification_ids:
-        sql = "INSERT INTO destination_classifications (destination_id, classification_id) VALUES (?, ?)"
-        for classification_id in classification_ids:
-            db.execute(sql, [destination_id, classification_id])
+    sql = "INSERT INTO destination_classes (destination_id, title, value) VALUES (?, ?, ?)"
+    for class_title, class_value in classes:
+        db.execute(sql, [destination_id, class_title, class_value])
 
-
-def get_all_classifications():
-    sql = "SELECT id, name FROM classifications ORDER BY name"
-    return db.query(sql)
 
 def get_destinations_by_user(user_id):
     sql = """
-    SELECT d.id, d.name, d.description, d.municipality, GROUP_CONCAT(c.name) as classifications
+    SELECT d.id, d.name, d.description, d.municipality, GROUP_CONCAT(dc.title) classes
     FROM destinations d
-    LEFT JOIN destination_classifications dc ON d.id = dc.destination_id
-    LEFT JOIN classifications c ON dc.classification_id = c.id
+    LEFT JOIN destination_classes dc ON d.id = dc.destination_id
     WHERE d.user_id = ?
     GROUP BY d.id
     ORDER BY d.id
     """
     return db.query(sql, [user_id])
 
+
 def get_destinations():
     sql = """
-    SELECT d.id, d.name, d.description, d.municipality, GROUP_CONCAT(c.name) as classifications
+    SELECT d.id, d.name, d.description, d.municipality
     FROM destinations d
-    LEFT JOIN destination_classifications dc ON d.id = dc.destination_id
-    LEFT JOIN classifications c ON dc.classification_id = c.id
-    GROUP BY d.id
-    ORDER BY d.id
     """
     return db.query(sql)
 
 
-def get_destination_by_id(destination_id):
+def get_destination(destination_id):
     sql = """
-    SELECT d.id, d.name, d.description, d.municipality, u.username, u.id as user_id, GROUP_CONCAT(c.name) as classifications
+    SELECT d.id, d.name, d.description, d.municipality, u.username, u.id as user_id
     FROM destinations d
-    LEFT JOIN users u ON d.user_id = u.id
-    LEFT JOIN destination_classifications dc ON d.id = dc.destination_id
-    LEFT JOIN classifications c ON dc.classification_id = c.id
+    JOIN users u ON d.user_id = u.id
     WHERE d.id = ?
-    GROUP BY d.id
     """
     result = db.query(sql, [destination_id])
     return result[0] if result else None
@@ -64,24 +80,31 @@ def search_destinations_by_query(query: str):
     SELECT d.id, d.name, d.description, d.municipality, GROUP_CONCAT(c.name) as classifications
     FROM destinations d
     LEFT JOIN destination_classifications dc ON d.id = dc.destination_id
-    LEFT JOIN classifications c ON dc.classification_id = c.id
     WHERE (d.name LIKE ? OR d.description LIKE ?)
     GROUP BY d.id
     """
     return db.query(sql, [f"%{query}%", f"%{query}%"])
 
 
-def get_destinations_by_classification(classification_id):
+def get_destinations_by_class(classification_id):
     sql = """
     SELECT d.id, d.name, d.description, d.municipality, GROUP_CONCAT(c.name) as classifications
     FROM destinations d
     JOIN destination_classifications dc ON d.id = dc.destination_id
-    LEFT JOIN classifications c ON dc.classification_id = c.id
     WHERE dc.classification_id = ?
     GROUP BY d.id
     ORDER BY d.id
     """
     return db.query(sql, [classification_id])
+
+
+def get_destination_classes(destination_id):
+    sql = "SELECT title, value FROM destination_classes WHERE destination_id = ?"
+    result = db.query(sql, [destination_id])
+    classes = {}
+    for title, value in result:
+        classes[title] = value
+    return classes
 
 
 def get_destination_classifications_ids(destination_id):
@@ -94,20 +117,16 @@ def get_destination_classifications_ids(destination_id):
     return [row["classification_id"] for row in result]
 
 
-def update_destination(
-    destination_id, name, description, municipality, classification_ids
-):
+def update_destination(destination_id, name, description, municipality, classes):
     sql = """UPDATE destinations SET name = ?, description = ?, municipality = ? WHERE id = ?"""
     db.execute(sql, [name, description, municipality, destination_id])
 
-    # TODO: Refactor
-    sql = "DELETE FROM destination_classifications WHERE destination_id = ?"
+    sql = "DELETE FROM destination_classes WHERE destination_id = ?"
     db.execute(sql, [destination_id])
 
-    if classification_ids:
-        sql = "INSERT INTO destination_classifications (destination_id, classification_id) VALUES (?, ?)"
-        for classification_id in classification_ids:
-            db.execute(sql, [destination_id, classification_id])
+    sql = "INSERT INTO destination_classes (destination_id, title, value) VALUES (?, ?, ?)"
+    for class_title, class_value in classes:
+        db.execute(sql, [destination_id, class_title, class_value])
 
 
 def delete_destination(destination_id):

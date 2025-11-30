@@ -1,3 +1,6 @@
+from flask import abort
+
+
 def is_number(value):
     try:
         value = int(value)
@@ -6,22 +9,48 @@ def is_number(value):
         return False
 
 
+def is_valid_required_classes(value, param):
+    # value is a list of [type, class] pairs
+    required_types = param.get("required_types", [])
+    all_classes = param.get("all_classes", {})
+
+    for entry in value:
+        if len(entry) == 2:
+            class_title, class_value = entry  
+            if class_title not in all_classes:
+                return False
+            if class_value not in all_classes[class_title]:
+                return False
+            #classes.append((class_title, class_value))
+        else:
+            return False
+
+    
+
+    
+    return True
+
+
 validators = {
-    "min": [lambda value, param, dto: len(value) >= param, "{} on liian lyhyt."],
-    "max": [lambda value, param, dto: len(value) <= param, "{} on liian pitkä."],
+    "min": [lambda value, param, data: len(value) >= param, "{} on liian lyhyt."],
+    "max": [lambda value, param, data: len(value) <= param, "{} on liian pitkä."],
     "number": [
-        lambda value, param, dto: is_number(value) == param,
+        lambda value, param, data: is_number(value) == param,
         "{} pitää olla numero.",
     ],
-    "required": [lambda value, param, dto: len(value) > 0, "{} on pakollinen."],
+    "required": [lambda value, param, data: len(value) > 0, "{} on pakollinen."],
     "equals": [
-        lambda value, param, dto: value == dto.get(param, None),
+        lambda value, param, data: value == data.get(param, None),
         "{} eivät ole samoja.",
     ],
     "trim": [True, "For placing only front-end validation purposes. Always trimmed."],
     "word_count": [
-        lambda value, param, dto: len(value.split()) == param,
+        lambda value, param, data: len(value.split()) == param,
         "{} pitää sisältää tasan {} sanaa.",
+    ],
+    "require": [
+        lambda value, param, data: is_valid_required_classes(value, param),
+        "Luokitukset eivät ole kelvollisia.",
     ],
 }
 
@@ -40,6 +69,7 @@ def schema_to_input(schema):
             if validator == "trim" and param is True:
                 options.append('pattern="\S+"')
 
+
         inputs[key] = " ".join(options)
     return inputs
 
@@ -48,16 +78,21 @@ def validator(data, schema):
     errors = {}
     validated = {}
     for key, rules in schema.items():
+        if rules.get("require", None):
+            value = [item.split(":") for item in data.getlist(key)]
+        else:
+            value = data[key].strip()
+
         for validator, param in rules.items():
             if validator == "translation":
                 continue
-            is_valid = validators[validator][0](data[key], param, data)
+            is_valid = validators[validator][0](value, param, data)
             if not is_valid:
                 translated_key = rules.get("translation", key)
                 errors[key] = validators[validator][1].format(translated_key, param)
                 break
             else:
-                validated[key] = data[key].strip()
+                validated[key] = value
 
     return validated, errors if len(errors.keys()) else None
 
@@ -77,7 +112,8 @@ if __name__ == "__main__":
         "username2": {"equals": "username"},
     }
     validated, errors = validator(
-        {"username": "jyrki a", "username2": "sjdg", "password": "", "test": "3"}, schema
+        {"username": "jyrki a", "username2": "sjdg", "password": "", "test": "3"},
+        schema,
     )
 
     print(errors)

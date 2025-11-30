@@ -26,51 +26,62 @@ def index():
     destinations_list = destinations.get_destinations()
     return render_template("index.html", destinations=destinations_list)
 
-
 @app.route("/find-destination")
 def find_destination():
-    classifications = destinations.get_all_classifications()
+    classes = destinations.get_all_classes()
     query = request.args.get("query", "")
-    classification_id = request.args.get("classification")
+    classification_id = request.args.get("classification_id")
 
     results = []
     if query:
         results = destinations.search_destinations_by_query(query)
     elif classification_id:
-        results = destinations.get_destinations_by_classification(classification_id)
+        results = destinations.get_destinations_by_class(classification_id)
 
     return render_template(
         "find_destination.html",
-        classifications=classifications,
+        classes=classes,
         query=query,
         results=results,
     )
 
-
 @app.route("/destination/<int:destination_id>")
 def destination_page(destination_id):
-    destination = destinations.get_destination_by_id(destination_id)
+    destination = destinations.get_destination(destination_id)
+    classes = destinations.get_destination_classes(destination_id)
+
+    print(dict(classes))
+
     if not destination:
         abort(404)
-    return render_template("destination.html", destination=destination)
+    return render_template("destination.html", destination=destination, classes=classes)
 
 
 @app.route("/add-destination", methods=["GET", "POST"])
 def add_destination():
     require_login()
-
+    all_classes = destinations.get_all_classes()
     schema = {
-        "name": {"required": True, "translation": "Nimi"},
-        "description": {"required": True, "translation": "Kuvaus"},
-        "municipality": {"required": True, "translation": "Kunta"},
+        "name": {"required": True, "translation": "Nimi", "min": 10, "max": 50},
+        "description": {"required": True, "translation": "Kuvaus", "max": 1000},
+        "municipality": {
+            "required": True,
+            "translation": "Kunta",
+        },
+        "classes": {
+            "require": {
+                "required_types": ["Tyyppi", "Vaikeusaste"],
+                "all_classes": all_classes,
+            }
+        },
     }
 
     if request.method == "GET":
         form_data, errors = session_utils.get_form_and_errors()
-        classifications = destinations.get_all_classifications()
+
         return render_template(
             "add_destination.html",
-            classifications=classifications,
+            classes=all_classes,
             form_data=form_data,
             errors=errors,
             schema=validator.schema_to_input(schema),
@@ -85,7 +96,8 @@ def add_destination():
             return redirect("/add-destination")
 
         # TODO
-        classification_ids = request.form.getlist("classifications")
+        print("Validated classes:")
+        print(validated["classes"])
 
         try:
             destinations.add_destination(
@@ -93,7 +105,7 @@ def add_destination():
                 validated["description"],
                 validated["municipality"],
                 session["user_id"],
-                classification_ids,
+                validated["classes"],
             )
             flash("Retkipaikka lisätty onnistuneesti.")
             return redirect("/")
@@ -106,45 +118,65 @@ def add_destination():
 @app.route("/destination/<int:destination_id>/edit", methods=["GET", "POST"])
 def edit_destination(destination_id):
     require_login()
-    destination = destinations.get_destination_by_id(destination_id)
+    destination = destinations.get_destination(destination_id)
+
     if not destination or destination["user_id"] != session["user_id"]:
         abort(403)
 
+    all_classes = destinations.get_all_classes()
+    schema = {
+        "name": {"required": True, "translation": "Nimi", "min": 10, "max": 50},
+        "description": {"required": True, "translation": "Kuvaus", "max": 1000},
+        "municipality": {
+            "required": True,
+            "translation": "Kunta",
+        },
+        "classes": {
+            "require": {
+                "required_types": ["Tyyppi", "Vaikeusaste"],
+                "all_classes": all_classes,
+            }
+        },
+    }
+
     if request.method == "GET":
-        classifications = destinations.get_all_classifications()
-        current_classifications = destinations.get_destination_classifications_ids(
-            destination_id
-        )
+        current_classes = destinations.get_destination_classes(destination_id)
+
         return render_template(
             "edit_destination.html",
-            destination=destination,
-            classifications=classifications,
-            current_classifications=current_classifications,
+            classes=all_classes,
+            form_data=destination,
+            schema=validator.schema_to_input(schema),
+            current_classes=current_classes,
         )
 
     if request.method == "POST":
         check_csrf()
-        name = request.form["name"]
-        description = request.form["description"]
-        municipality = request.form["municipality"]
-        classifications_selected = request.form.getlist("classifications")
+        validated, errors = validator.validator(request.form, schema)
 
-        if not name or not description or not municipality:
-            flash("Kaikki kentät ovat pakollisia.", "error")
+        print("error")
+        print(errors)
+        print("validated")
+        print(validated)
+
+        if errors:
+            flash("Lomakkeen tiedot eivät kelpaa", "error")
+            session_utils.set_form_and_errors(validated, errors)
             return redirect(f"/destination/{destination_id}/edit")
 
         try:
             destinations.update_destination(
                 destination_id,
-                name,
-                description,
-                municipality,
-                classifications_selected,
+                validated["name"],
+                validated["description"],
+                validated["municipality"],
+                validated["classes"],
             )
             flash("Retkipaikka päivitetty.")
             return redirect(f"/destination/{destination_id}")
-        except Exception:
-            flash("Virhe retkipaikan päivityksessä.", "error")
+        except Exception as e:
+            #flash("Virhe retkipaikan päivityksessä.", "error")
+            flash(e)
             return redirect(f"/destination/{destination_id}/edit")
 
 

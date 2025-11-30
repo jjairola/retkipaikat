@@ -2,27 +2,35 @@
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     <div>
         <label for="name">Nimi</label>
-        <input id="name" type="text" name="name" value="{{ destination.name if destination else '' }}" maxlength="50"
-            required>
+        <input id="name" type="text" name="name" value="{{ form_data.name }}" {{ schema.name }} />
     </div>
     <div>
         <label for="description">Kuvaus</label>
-        <textarea id="description" name="description" rows="4" cols="50" maxlength="1000"
-            required>{{ destination.description if destination else '' }}</textarea>
+        <textarea id="description" name="description" rows="4" cols="50" maxlength="1000" {{ schema.description
+            }}>{{ form_data.description }}</textarea>
     </div>
     <div>
         <label for="municipality">Kunta</label>
-        <input id="municipality" type="text" name="municipality"
-            value="{{ destination.municipality if destination else '' }}" maxlength="50" required>
+        <input id="municipality" type="text" name="municipality" value="{{ form_data.municipality }}" {{
+            schema.municipality }} />
     </div>
     <div>
-        <label for="classifications">Luokitukset</label>
-        <select multiple id="classifications" name="classifications">
-            {% for classification in classifications %}
-            <option value="{{ classification.id }}" {% if current_classifications and classification.id in
-                current_classifications %}selected{% endif %}>{{ classification.name }}</option>
-            {% endfor %}
-        </select>
+        {% for class in classes %}
+        <p>
+            <label for="class{{ class }}">{{ class }}</label>
+            <select name="classes" id="class{{ class }}">
+                <option value="">(valitse)</option>
+                {% for option in classes[class] %}
+                {% if False %}
+                <option value="{{ class }}:{{ option }}" selected>{{ option }}</option>
+                {% else %}
+                {{ form_data.classes }}
+                <option value="{{ class }}:{{ option }}">{{ option }}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+        </p>
+        {% endfor %}
     </div>
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
 
