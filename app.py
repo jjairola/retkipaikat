@@ -1,5 +1,3 @@
-from os import error
-import re
 from flask import Flask, abort
 from flask import flash, redirect, render_template, request, session
 import secrets
@@ -7,7 +5,7 @@ import config
 import users
 import destinations
 import validator
-import session as session_utils
+import session_utils
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -145,7 +143,7 @@ def edit_destination(destination_id):
             )
             flash("Retkipaikka päivitetty.")
             return redirect(f"/destination/{destination_id}")
-        except Exception as e:
+        except Exception:
             flash("Virhe retkipaikan päivityksessä.", "error")
             return redirect(f"/destination/{destination_id}/edit")
 
@@ -165,7 +163,7 @@ def delete_destination(destination_id):
             destinations.delete_destination(destination_id)
             flash("Retkipaikka poistettu.")
             return redirect("/")
-        except Exception as e:
+        except Exception:
             flash("Virhe retkipaikan poistamisessa.", "error")
             return redirect(f"/destination/{destination_id}")
 
