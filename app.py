@@ -24,24 +24,29 @@ def check_csrf():
 @app.route("/")
 def index():
     destinations_list = destinations.get_destinations()
+    print(destinations_list)
     return render_template("index.html", destinations=destinations_list)
 
 @app.route("/find-destination")
 def find_destination():
     classes = destinations.get_all_classes()
-    query = request.args.get("query", "")
-    classification_id = request.args.get("classification_id")
+
+    print(dict(classes))
+
+    query_text = request.args.get("query", "")
+    query_class = request.args.get("class", "")
 
     results = []
-    if query:
-        results = destinations.search_destinations_by_query(query)
-    elif classification_id:
-        results = destinations.get_destinations_by_class(classification_id)
+    if query_text:
+        results = destinations.search_destinations_by_query(query_text)
+    elif query_class:
+        title, value = query_class.split(":", 1)
+        results = destinations.get_destinations_by_class(title, value)
 
     return render_template(
         "find_destination.html",
         classes=classes,
-        query=query,
+        query=query_text,
         results=results,
     )
 

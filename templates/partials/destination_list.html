@@ -6,10 +6,10 @@
         <h3><a href="/destination/{{ destination.id }}" class="text-blue-600 hover:underline">{{ destination.name }}</a>
         </h3>
         <p>{{ destination.description }}</p>
-        {% if destination.classifications %}
+        {% if destination.classes %}
         <div class="flex flex-wrap">
-            {% for classification in destination.classifications.split(',') %}
-            <span class="pill">{{ classification }}</span>
+            {% for class_title, class_value in destination.classes.items() %}
+                <span class="pill">{{ class_title }}: {{ class_value }}</span>
             {% endfor %}
         </div>
         {% endif %}

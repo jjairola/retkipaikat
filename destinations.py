@@ -58,10 +58,33 @@ def get_destinations_by_user(user_id):
 
 def get_destinations():
     sql = """
-    SELECT d.id, d.name, d.description, d.municipality
+    SELECT d.id, d.name, d.description, d.municipality, GROUP_CONCAT(dc.title || ':' || dc.value, ';') classes
     FROM destinations d
+    LEFT JOIN destination_classes dc ON d.id = dc.destination_id
+    GROUP BY d.id
     """
-    return db.query(sql)
+
+    rows = db.query(sql)
+    
+    results = []
+    for row in rows:
+        result = dict(row)
+        if row["classes"]:
+            classes = row["classes"].split(";")
+            class_dict = {}
+            for class_item in classes:
+                if class_item == "":
+                    continue
+                title, value = class_item.split(":")
+                print(title)
+                print(value)
+                class_dict[title] = value
+            result["classes"] = class_dict
+        else:
+            result["classes"] = {}
+        results.append(result)
+    
+    return results
 
 
 def get_destination(destination_id):
@@ -77,25 +100,21 @@ def get_destination(destination_id):
 
 def search_destinations_by_query(query: str):
     sql = """
-    SELECT d.id, d.name, d.description, d.municipality, GROUP_CONCAT(c.name) as classifications
+    SELECT d.id, d.name, d.description, d.municipality
     FROM destinations d
-    LEFT JOIN destination_classifications dc ON d.id = dc.destination_id
     WHERE (d.name LIKE ? OR d.description LIKE ?)
-    GROUP BY d.id
     """
     return db.query(sql, [f"%{query}%", f"%{query}%"])
 
 
-def get_destinations_by_class(classification_id):
+def get_destinations_by_class(title, value):
     sql = """
-    SELECT d.id, d.name, d.description, d.municipality, GROUP_CONCAT(c.name) as classifications
+    SELECT d.id, d.name, d.description, d.municipality
     FROM destinations d
-    JOIN destination_classifications dc ON d.id = dc.destination_id
-    WHERE dc.classification_id = ?
-    GROUP BY d.id
-    ORDER BY d.id
+    JOIN destination_classes dc ON d.id = dc.destination_id
+    WHERE dc.title = ? AND dc.value = ?
     """
-    return db.query(sql, [classification_id])
+    return db.query(sql, [title, value])
 
 
 def get_destination_classes(destination_id):

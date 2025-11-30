@@ -15,17 +15,19 @@
 
 <h2>Etsi retkipaikkaa luokituksella</h2>
 
-<ul>
-{% for classification in classifications %}
-<li><a href="/find-destination?classification={{ classification.id }}">{{ classification.name }}</a></li>
+
+{% for class_name, values in classes.items() %}
+    <h3>{{ class_name }}</h3>
+    {% for value in values %}
+        <a href="/find-destination?class={{ class_name }}:{{ value }}">{{ value }}</a>
+    {% endfor %}
 {% endfor %}
-</ul>
 
 
 <h3>Tulokset</h3>
 {% if results %}
 {% for destination in results %}
-    {% include "partials/destination_list.html" %}
+{% include "partials/destination_list.html" %}
 {% endfor %}
 {% else %}
 <p>Ei tuloksia.</p>
