@@ -1,6 +1,5 @@
 import db
 
-
 class DestinationError(Exception):
     pass
 
@@ -135,7 +134,10 @@ def update_destination(destination_id, name, description, municipality, classes)
 
 
 def delete_destination(destination_id):
-    sql = "DELETE FROM destination_classifications WHERE destination_id = ?"
+    sql = "DELETE FROM comments WHERE destination_id = ?"
+    db.execute(sql, [destination_id])
+
+    sql = "DELETE FROM destination_classes WHERE destination_id = ?"
     db.execute(sql, [destination_id])
 
     sql = "DELETE FROM destinations WHERE id = ?"

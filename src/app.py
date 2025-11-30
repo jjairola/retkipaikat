@@ -182,7 +182,7 @@ def edit_destination(destination_id):
 @app.route("/destination/<int:destination_id>/delete", methods=["GET", "POST"])
 def delete_destination(destination_id):
     require_login()
-    destination = destinations.get_destination_by_id(destination_id)
+    destination = destinations.get_destination(destination_id)
     if not destination or destination["user_id"] != session["user_id"]:
         abort(403)
 
