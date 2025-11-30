@@ -27,6 +27,7 @@ def index():
     print(destinations_list)
     return render_template("index.html", destinations=destinations_list)
 
+
 @app.route("/find-destination")
 def find_destination():
     classes = destinations.get_all_classes()
@@ -50,6 +51,7 @@ def find_destination():
         results=results,
     )
 
+
 @app.route("/destination/<int:destination_id>")
 def destination_page(destination_id):
     destination = destinations.get_destination(destination_id)
@@ -60,7 +62,12 @@ def destination_page(destination_id):
 
     if not destination:
         abort(404)
-    return render_template("show_destination.html", destination=destination, classes=classes, comments=comments)
+    return render_template(
+        "show_destination.html",
+        destination=destination,
+        classes=classes,
+        comments=comments,
+    )
 
 
 @app.route("/add-destination", methods=["GET", "POST"])
@@ -96,7 +103,7 @@ def add_destination():
     if request.method == "POST":
         check_csrf()
 
-        print("Adding destination with data:", request.form )
+        print("Adding destination with data:", request.form)
 
         validated, errors = validator.validator(request.form, schema)
         if errors:
@@ -185,7 +192,7 @@ def edit_destination(destination_id):
             flash("Retkipaikka päivitetty.")
             return redirect(f"/destination/{destination_id}")
         except Exception as e:
-            #flash("Virhe retkipaikan päivityksessä.", "error")
+            # flash("Virhe retkipaikan päivityksessä.", "error")
             flash(e)
             return redirect(f"/destination/{destination_id}/edit")
 
@@ -315,20 +322,25 @@ def create_comment():
     check_csrf()
 
     destination_id = request.form.get("destination_id")
-    comment = request.form.get("comment")
 
     schema = {
         "comment": {"required": True, "translation": "Kommentti", "max": 1000},
-        "destination_id": {"required": True}
+        "rating": {"required": True, "translation": "Arvostelu", "min": 1, "max": 5},
+        "destination_id": {"required": True},
     }
 
     validated, errors = validator.validator(request.form, schema)
     if errors:
         flash("Virhe kommentissa", "error")
-        return redirect(f"/destination/{destination_id}")
+        return redirect(f"/destination/{validated['destination_id']}")
 
     try:
-        destinations.add_comment(int(validated["destination_id"]), session["user_id"], validated["comment"], 0)
+        destinations.add_comment(
+            int(validated["destination_id"]),
+            session["user_id"],
+            validated["comment"],
+            validated["rating"],
+        )
         flash("Kommentti lisätty.")
     except Exception as e:
         print(e)
@@ -342,7 +354,9 @@ def profile():
     require_login()
     user_destinations = destinations.get_destinations_by_user(session["user_id"])
     comments = destinations.get_comments_by_user(session["user_id"])
-    return render_template("profile.html", destinations=user_destinations, comments=comments)
+    return render_template(
+        "profile.html", destinations=user_destinations, comments=comments
+    )
 
 
 @app.errorhandler(404)

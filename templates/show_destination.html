@@ -24,8 +24,11 @@
 {% if comments %}
 <h3>Kommentit</h3>
 {% for comment_row in comments %}
-<div>
-    <p><strong>{{ comment_row.username }}:</strong> {{ comment_row.comment }}</p>
+<div class="comment">
+    <span>
+        <strong>{{ comment_row.created_at }} {{ comment_row.username }}:</strong> Arvosana: {{ comment_row.rating }}
+    </span>
+    <p>{{ comment_row.comment }}</p>
 </div>
 {% endfor %}
 {% else %}
@@ -37,7 +40,9 @@
 <h3>Uusi kommentti</h3>
 <form action="/create_comment" method="post">
     <label for="comment">Kommentti</label>
-    <input type="text" name="comment" id="comment" required />
+    <textarea name="comment" id="comment" required></textarea><br>
+    <label for="rating">Arvosana (1-5)</label>
+    <input type="number" name="rating" id="rating" min="1" max="5" /><br>
     <input type="hidden" name="destination_id" value="{{ destination.id }}">
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <input type="submit" value="Lähetä" />

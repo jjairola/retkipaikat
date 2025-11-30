@@ -25,11 +25,14 @@ def add_comment(destination_id, user_id, comment, rating):
 
 
 def get_comments(destination_id):
-    sql = """SELECT comments.comment, comments.rating, users.id user_id, users.username
-             FROM comments, users
-             WHERE comments.destination_id = ? AND comments.user_id = users.id
-             ORDER BY comments.id DESC"""
+    sql = """SELECT c.created_at, c.comment, c.rating, u.id user_id, u.username
+             FROM comments c
+             LEFT JOIN users u ON c.user_id = u.id
+             WHERE c.destination_id = ?
+             ORDER BY c.id DESC"""
     return db.query(sql, [destination_id])
+
+
 def get_comments_by_user(user_id):
     sql = """SELECT c.comment, c.rating, d.name as destination_name, d.id as destination_id
              FROM comments c
@@ -65,14 +68,18 @@ def get_destinations_by_user(user_id):
 
 def get_destinations():
     sql = """
-    SELECT d.id, d.name, d.description, d.municipality, GROUP_CONCAT(dc.title || ':' || dc.value, ';') classes
+    SELECT d.id, d.name, d.description, d.municipality, 
+            GROUP_CONCAT(dc.title || ':' || dc.value, ';') classes,
+            SUM(c.rating) / COUNT(c.id) as average_rating
     FROM destinations d
     LEFT JOIN destination_classes dc ON d.id = dc.destination_id
+    LEFT JOIN comments c ON d.id = c.destination_id
     GROUP BY d.id
+    ORDER BY average_rating DESC
     """
 
     rows = db.query(sql)
-    
+
     results = []
     for row in rows:
         result = dict(row)
@@ -90,7 +97,7 @@ def get_destinations():
         else:
             result["classes"] = {}
         results.append(result)
-    
+
     return results
 
 
