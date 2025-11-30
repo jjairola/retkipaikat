@@ -10,20 +10,18 @@ def is_number(value):
 
 
 def is_valid_required_classes(value, param):
-    # value is a list of [type, class] pairs
     required_types = param.get("required_types", [])
     all_classes = param.get("all_classes", {})
 
     entered_types = []
     for entry in value:
-        
         if len(entry) == 2:
-            class_title, class_value = entry  
+            class_title, class_value = entry
             if class_title not in all_classes:
                 return False
             if class_value not in all_classes[class_title]:
                 return False
-            
+
             entered_types.append(class_title)
         else:
             return False
@@ -32,7 +30,7 @@ def is_valid_required_classes(value, param):
     for required_type in required_types:
         if required_type not in entered_types:
             return False
-    
+
     return True
 
 
@@ -73,7 +71,6 @@ def schema_to_input(schema):
                 options.append(f"maxlength={param}")
             if validator == "trim" and param is True:
                 options.append('pattern="\S+"')
-
 
         inputs[key] = " ".join(options)
     return inputs

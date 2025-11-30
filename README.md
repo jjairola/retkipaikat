@@ -14,6 +14,8 @@ Tässä pääasiallinen tietokohde on retkipaikka ja toissijainen tietokohde on 
 
 ## Sovelluksen asennus
 
+A. Kurssin suositustapa.
+
 Asenna `flask`-kirjasto.
 
 ```
@@ -34,3 +36,18 @@ $ flask run
 ```
 
 Mene selaimella http://localhost:5000
+
+B. Koko kehitysympäristö pylint + black +penv
+
+
+## Ohjelman suoritus
+
+Ohjeet (Mac/Linux):
+
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cd src
+flash run
+```

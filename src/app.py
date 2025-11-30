@@ -4,8 +4,10 @@ import secrets
 import config
 import users
 import destinations
+import comments
 import validator
 import session_utils
+
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -56,7 +58,7 @@ def find_destination():
 def destination_page(destination_id):
     destination = destinations.get_destination(destination_id)
     classes = destinations.get_destination_classes(destination_id)
-    comments = destinations.get_comments(destination_id)
+    comments_list = comments.get_comments(destination_id)
 
     print(dict(classes))
 
@@ -66,7 +68,7 @@ def destination_page(destination_id):
         "show_destination.html",
         destination=destination,
         classes=classes,
-        comments=comments,
+        comments=comments_list,
     )
 
 
@@ -335,7 +337,7 @@ def create_comment():
         return redirect(f"/destination/{validated['destination_id']}")
 
     try:
-        destinations.add_comment(
+        comments.add_comment(
             int(validated["destination_id"]),
             session["user_id"],
             validated["comment"],
@@ -353,9 +355,9 @@ def create_comment():
 def profile():
     require_login()
     user_destinations = destinations.get_destinations_by_user(session["user_id"])
-    comments = destinations.get_comments_by_user(session["user_id"])
+    comments_list = comments.get_comments_by_user(session["user_id"])
     return render_template(
-        "profile.html", destinations=user_destinations, comments=comments
+        "profile.html", destinations=user_destinations, comments=comments_list
     )
 
 
