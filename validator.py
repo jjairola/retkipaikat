@@ -14,19 +14,24 @@ def is_valid_required_classes(value, param):
     required_types = param.get("required_types", [])
     all_classes = param.get("all_classes", {})
 
+    entered_types = []
     for entry in value:
+        
         if len(entry) == 2:
             class_title, class_value = entry  
             if class_title not in all_classes:
                 return False
             if class_value not in all_classes[class_title]:
                 return False
-            #classes.append((class_title, class_value))
+            
+            entered_types.append(class_title)
         else:
             return False
 
-    
-
+    print("entered types:", entered_types)
+    for required_type in required_types:
+        if required_type not in entered_types:
+            return False
     
     return True
 

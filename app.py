@@ -54,12 +54,13 @@ def find_destination():
 def destination_page(destination_id):
     destination = destinations.get_destination(destination_id)
     classes = destinations.get_destination_classes(destination_id)
+    comments = destinations.get_comments(destination_id)
 
     print(dict(classes))
 
     if not destination:
         abort(404)
-    return render_template("destination.html", destination=destination, classes=classes)
+    return render_template("show_destination.html", destination=destination, classes=classes, comments=comments)
 
 
 @app.route("/add-destination", methods=["GET", "POST"])
@@ -95,14 +96,18 @@ def add_destination():
     if request.method == "POST":
         check_csrf()
 
+        print("Adding destination with data:", request.form )
+
         validated, errors = validator.validator(request.form, schema)
         if errors:
+            print("errors")
+            print(errors)
+            flash("Lomakkeen tiedot eivät kelpaa", "error")
             session_utils.set_form_and_errors(validated, errors)
             return redirect("/add-destination")
 
-        # TODO
-        print("Validated classes:")
-        print(validated["classes"])
+        print("validated")
+        print(validated)
 
         try:
             destinations.add_destination(
@@ -304,11 +309,40 @@ def logout():
     return redirect("/")
 
 
+@app.route("/create_comment", methods=["POST"])
+def create_comment():
+    require_login()
+    check_csrf()
+
+    destination_id = request.form.get("destination_id")
+    comment = request.form.get("comment")
+
+    schema = {
+        "comment": {"required": True, "translation": "Kommentti", "max": 1000},
+        "destination_id": {"required": True}
+    }
+
+    validated, errors = validator.validator(request.form, schema)
+    if errors:
+        flash("Virhe kommentissa", "error")
+        return redirect(f"/destination/{destination_id}")
+
+    try:
+        destinations.add_comment(int(validated["destination_id"]), session["user_id"], validated["comment"], 0)
+        flash("Kommentti lisätty.")
+    except Exception as e:
+        print(e)
+        flash("Virhe kommentin lisäämisessä.", "error")
+
+    return redirect(f"/destination/{destination_id}")
+
+
 @app.route("/profile")
 def profile():
     require_login()
     user_destinations = destinations.get_destinations_by_user(session["user_id"])
-    return render_template("profile.html", destinations=user_destinations)
+    comments = destinations.get_comments_by_user(session["user_id"])
+    return render_template("profile.html", destinations=user_destinations, comments=comments)
 
 
 @app.errorhandler(404)

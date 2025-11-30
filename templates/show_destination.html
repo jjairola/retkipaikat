@@ -21,6 +21,30 @@
     </div>
 </div>
 
+{% if comments %}
+<h3>Kommentit</h3>
+{% for comment_row in comments %}
+<div>
+    <p><strong>{{ comment_row.username }}:</strong> {{ comment_row.comment }}</p>
+</div>
+{% endfor %}
+{% else %}
+<p>Ei kommentteja.</p>
+{% endif %}
+
+
+{% if session.user_id %}
+<h3>Uusi kommentti</h3>
+<form action="/create_comment" method="post">
+    <label for="comment">Kommentti</label>
+    <input type="text" name="comment" id="comment" required />
+    <input type="hidden" name="destination_id" value="{{ destination.id }}">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+    <input type="submit" value="Lähetä" />
+</form>
+{% endif %}
+
+
 <div>
     {% if session.user_id and session.user_id == destination.user_id %}
     <a class="button" href="/destination/{{ destination.id }}/edit" class="button">Muokkaa</a>

@@ -21,4 +21,19 @@
 <p>Sinulla ei ole vielä lisättyjä retkipaikkoja.</p>
 {% endif %}
 
+<h3>Omat kommentit</h3>
+
+{% if comments %}
+<ul>
+    {% for comment in comments %}
+    <li>
+        "{{ comment.comment }}" - <a href="/destination/{{ comment.destination_id }}">{{ comment.destination_name }}</a>
+        {% if comment.rating %} (Rating: {{ comment.rating }}) {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>Sinulla ei ole vielä kommentteja.</p>
+{% endif %}
+
 {% endblock %}

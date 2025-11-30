@@ -30,6 +30,13 @@ def get_comments(destination_id):
              WHERE comments.destination_id = ? AND comments.user_id = users.id
              ORDER BY comments.id DESC"""
     return db.query(sql, [destination_id])
+def get_comments_by_user(user_id):
+    sql = """SELECT c.comment, c.rating, d.name as destination_name, d.id as destination_id
+             FROM comments c
+             JOIN destinations d ON c.destination_id = d.id
+             WHERE c.user_id = ?
+             ORDER BY c.id DESC"""
+    return db.query(sql, [user_id])
 
 
 def add_destination(name, description, municipality, user_id, classes):

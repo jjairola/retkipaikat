@@ -1,5 +1,4 @@
 <form action="{{ action_url }}" method="post">
-    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     <div>
         <label for="name">Nimi</label>
         <input id="name" type="text" name="name" value="{{ form_data.name }}" {{ schema.name }} />
