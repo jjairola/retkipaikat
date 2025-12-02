@@ -36,8 +36,9 @@ def get_destinations(
     sql = """
     SELECT d.id, d.name, d.description, d.municipality,
             GROUP_CONCAT(dc.title || ':' || dc.value, ';') classes,
-            ROUND(COALESCE(AVG(c.rating), 0), 1) as average_rating
+            rc.average_rating
     FROM destinations d
+    LEFT JOIN ratings_cache rc ON d.id = rc.destination_id
     LEFT JOIN destination_classes dc ON d.id = dc.destination_id
     LEFT JOIN comments c ON d.id = c.destination_id
     """
@@ -45,21 +46,21 @@ def get_destinations(
     # where(s)
 
     params = []
-    if user_id is not None:
-        sql += "WHERE d.user_id = ? "
-        params = [user_id]
+    # if user_id is not None:
+    #     sql += "WHERE d.user_id = ? "
+    #     params = [user_id]
 
-    if destination_id is not None:
-        sql += "WHERE d.id = ? "
-        params = [destination_id]
+    # if destination_id is not None:
+    #     sql += "WHERE d.id = ? "
+    #     params = [destination_id]
 
-    if query_text is not None:
-        sql += "WHERE (d.name LIKE ? OR d.description LIKE ?) "
-        params = [f"%{query_text}%", f"%{query_text}%"]
+    # if query_text is not None:
+    #     sql += "WHERE (d.name LIKE ? OR d.description LIKE ?) "
+    #     params = [f"%{query_text}%", f"%{query_text}%"]
 
-    if query_class is not None:
-        sql += "WHERE dc.title = ? AND dc.value = ? "
-        params = [query_class["title"], query_class["value"]]
+    # if query_class is not None:
+    #     sql += "WHERE dc.title = ? AND dc.value = ? "
+    #     params = [query_class["title"], query_class["value"]]
 
     sql += """
     GROUP BY d.id
@@ -78,19 +79,19 @@ def get_destinations(
     results = []
     for row in rows:
         result = dict(row)
-        if row["classes"]:
-            classes = row["classes"].split(";")
-            class_dict = {}
-            for class_item in classes:
-                if class_item == "":
-                    continue
-                title, value = class_item.split(":")
-                print(title)
-                print(value)
-                class_dict[title] = value
-            result["classes"] = class_dict
-        else:
-            result["classes"] = {}
+        # if row["classes"]:
+        #     classes = row["classes"].split(";")
+        #     class_dict = {}
+        #     for class_item in classes:
+        #         if class_item == "":
+        #             continue
+        #         title, value = class_item.split(":")
+        #         print(title)
+        #         print(value)
+        #         class_dict[title] = value
+        #     result["classes"] = class_dict
+        # else:
+        #     result["classes"] = {}
         results.append(result)
 
     return results

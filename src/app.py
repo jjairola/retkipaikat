@@ -7,6 +7,8 @@ import users
 import destinations
 import comments
 import math
+import time
+from flask import g
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -311,3 +313,15 @@ def profile():
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template("404.html"), 404
+
+
+
+@app.before_request
+def before_request():
+    g.start_time = time.time()
+
+@app.after_request
+def after_request(response):
+    elapsed_time = round(time.time() - g.start_time, 4)
+    print("elapsed time:", elapsed_time, "s")
+    return response
