@@ -1,30 +1,17 @@
 from flask import Flask, abort
 from flask import flash, redirect, render_template, request, session
+import utils
 import secrets
 import config
 import users
 import destinations
 import comments
-import markupsafe
+
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
+app.add_template_filter(utils.show_lines, name="show_lines")
 
-
-def require_login():
-    if "user_id" not in session:
-        abort(403)
-
-
-def check_csrf():
-    if request.form["csrf_token"] != session["csrf_token"]:
-        abort(403)
-
-@app.template_filter()
-def show_lines(content):
-    content = str(markupsafe.escape(content))
-    content = content.replace("\n", "<br />")
-    return markupsafe.Markup(content)
 
 @app.route("/")
 def index():
@@ -77,7 +64,7 @@ def destination_page(destination_id):
 
 @app.route("/add-destination", methods=["GET", "POST"])
 def add_destination():
-    require_login()
+    utils.require_login()
     all_classes = destinations.get_all_classes()
 
     if request.method == "GET":
@@ -89,7 +76,7 @@ def add_destination():
         )
 
     if request.method == "POST":
-        check_csrf()
+        utils.check_csrf()
 
         name = request.form.get("name")
         if not name or len(name) < 5 or len(name) > 80:
@@ -134,7 +121,7 @@ def add_destination():
 
 @app.route("/destination/<int:destination_id>/edit", methods=["GET", "POST"])
 def edit_destination(destination_id):
-    require_login()
+    utils.require_login()
     destination = destinations.get_destination(destination_id)
 
     if not destination or destination["user_id"] != session["user_id"]:
@@ -153,7 +140,7 @@ def edit_destination(destination_id):
         )
 
     if request.method == "POST":
-        check_csrf()
+        utils.check_csrf()
 
         name = request.form.get("name")
         description = request.form.get("description")
@@ -187,7 +174,7 @@ def edit_destination(destination_id):
 
 @app.route("/destination/<int:destination_id>/delete", methods=["GET", "POST"])
 def delete_destination(destination_id):
-    require_login()
+    utils.require_login()
     destination = destinations.get_destination(destination_id)
     if not destination or destination["user_id"] != session["user_id"]:
         abort(403)
@@ -268,8 +255,8 @@ def logout():
 
 @app.route("/create-comment", methods=["POST"])
 def create_comment():
-    require_login()
-    check_csrf()
+    utils.require_login()
+    utils.check_csrf()
 
     destination_id = request.form.get("destination_id")
     comment = request.form.get("comment")
@@ -278,7 +265,7 @@ def create_comment():
     if not comment or len(comment) < 1 or len(comment) > 500:
         flash("Kommentin pitää olla 1-500 merkkiä pitkä.", "error")
         return redirect(f"/destination/{destination_id}")
-    
+
     if not rating or int(rating) < 1 or int(rating) > 5:
         flash("Arvion pitää olla välillä 1-5.", "error")
         return redirect(f"/destination/{destination_id}")
@@ -300,7 +287,7 @@ def create_comment():
 
 @app.route("/profile")
 def profile():
-    require_login()
+    utils.require_login()
     user_destinations = destinations.get_destinations_by_user(session["user_id"])
     comments_list = comments.get_comments_by_user(session["user_id"])
     return render_template(
