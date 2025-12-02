@@ -79,19 +79,17 @@ def get_destinations(
     results = []
     for row in rows:
         result = dict(row)
-        # if row["classes"]:
-        #     classes = row["classes"].split(";")
-        #     class_dict = {}
-        #     for class_item in classes:
-        #         if class_item == "":
-        #             continue
-        #         title, value = class_item.split(":")
-        #         print(title)
-        #         print(value)
-        #         class_dict[title] = value
-        #     result["classes"] = class_dict
-        # else:
-        #     result["classes"] = {}
+        if row["classes"]:
+            classes = row["classes"].split(";")
+            class_dict = {}
+            for class_item in classes:
+                if class_item == "":
+                    continue
+                title, value = class_item.split(":")
+                class_dict[title] = value
+            result["classes"] = class_dict
+        else:
+            result["classes"] = {}
         results.append(result)
 
     return results

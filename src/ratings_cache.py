@@ -3,14 +3,19 @@ import db
 
 def update_cache(destination_id):
     sql = """
-    INSERT OR REPLACE INTO ratings_cache (destination_id, average_rating)
-    SELECT
-        ?,
-        ROUND(COALESCE(AVG(c.rating), 0), 1) AS average_rating
+    SELECT ROUND(COALESCE(AVG(c.rating), 0), 1) AS average_rating
     FROM comments c
     WHERE c.destination_id = ?
     """
-    db.execute(sql, [destination_id, destination_id])
+
+    result = db.query(sql, [destination_id])
+    average = result[0]["average_rating"] if result else 0
+
+    sql_update = """
+    INSERT OR REPLACE INTO ratings_cache (destination_id, average_rating)
+    VALUES (?, ?)
+    """
+    db.execute(sql_update, [destination_id, average])
 
 
 if __name__ == "__main__":

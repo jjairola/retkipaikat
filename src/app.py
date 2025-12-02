@@ -7,6 +7,7 @@ import users
 import destinations
 import comments
 import math
+import ratings_cache
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -27,7 +28,6 @@ def index(page=1):
         return redirect("/" + str(page_count))
 
     destinations_list = destinations.get_destinations(page=page, page_size=page_size)
-    print(destinations_list)
     return render_template(
         "index.html", destinations=destinations_list, page=page, page_count=page_count
     )
@@ -36,8 +36,6 @@ def index(page=1):
 @app.route("/find-destination")
 def find_destination():
     classes = destinations.get_all_classes()
-
-    print(dict(classes))
 
     query_text = request.args.get("query", "")
     query_class = request.args.get("class", "")
@@ -62,8 +60,6 @@ def destination_page(destination_id):
     destination = destinations.get_destination(destination_id)
     classes = destinations.get_destination_classes(destination_id)
     comments_list = comments.get_comments(destination_id)
-
-    print(dict(classes))
 
     if not destination:
         abort(404)
@@ -127,7 +123,6 @@ def add_destination():
             flash("Retkipaikka lisätty onnistuneesti.")
             return redirect("/")
         except Exception as e:
-            print(e)
             flash("Virhe retkipaikan lisäämisessä.", "error")
             return redirect("/add-destination")
 
@@ -288,11 +283,11 @@ def create_comment():
             destination_id,
             session["user_id"],
             comment,
-            rating,
+            int(rating),
         )
+        ratings_cache.update_cache(destination_id)
         flash("Kommentti lisätty.")
     except Exception as e:
-        print(e)
         flash("Virhe kommentin lisäämisessä.", "error")
 
     return redirect(f"/destination/{destination_id}")
