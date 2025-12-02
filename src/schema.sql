@@ -12,6 +12,11 @@ CREATE TABLE destinations (
     user_id INTEGER REFERENCES users
 );
 
+CREATE TABLE ratings_cache (
+    destination_id INTEGER PRIMARY KEY REFERENCES destinations ON DELETE CASCADE,
+    average_rating REAL
+);
+
 
 CREATE TABLE classes (
     id INTEGER PRIMARY KEY,
@@ -34,3 +39,4 @@ CREATE TABLE comments (
     rating INTEGER,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+

@@ -16,6 +16,11 @@ def execute(sql, params=[]):
     g.last_insert_id = result.lastrowid
     con.close()
 
+def execute_many(sql, param_list):
+    con = get_connection()
+    con.executemany(sql, param_list)
+    con.commit()
+    con.close()
 
 def last_insert_id():
     return g.last_insert_id
