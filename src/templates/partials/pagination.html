@@ -1,7 +1,33 @@
 {% if page %}
-<p>
-    <a href="/{{ page - 1 }}">&lt;&lt;</a>
-    Sivu {{ page }}/{{ page_count }}
-    <a href="/{{ page + 1 }}">&gt;&gt;</a>
-</p>
+
+{% set buttons = 5 %}
+
+{% if buttons > page_count %}
+    {% set buttons = page_count %}
+{% endif %}
+
+{% set start = page - (buttons // 2) %}
+{% if start < 1 %}
+    {% set start = 1 %}
+{% endif %}
+{% if start + buttons - 1 > page_count %}
+    {% set start = page_count - buttons + 1 %}
+    {% if start < 1 %}
+        {% set start = 1 %}
+    {% endif %}
+{% endif %}
+
+<ul class="pagination">
+    <li><a href="/1">&lt;&lt;</a></li>
+    {% for p in range(start, start + buttons) %}
+        {% if p == page %}
+            <li><a class="active" href="/{{ p }}">{{ p }}</a></li>
+        {% else %}
+            <li><a href="/{{ p }}">{{ p }}</a></li>
+        {% endif %}
+    
+    {% endfor %}
+    <li><a href="/{{ page_count }}">&gt;&gt;</a></li>
+</ul>
+
 {% endif %}

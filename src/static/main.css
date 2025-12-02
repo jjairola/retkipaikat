@@ -145,3 +145,25 @@ textarea {
 .list-rating {
     color: rgba(0, 0, 0, 0.7)
 }
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding-inline-start: 0;
+}
+
+.pagination li a {
+    display: block;
+    padding: 8px 12px;
+    text-decoration: none;
+    border: 1px solid gray;
+    color: black;
+    margin: 0 4px;
+    border-radius: 5px;
+}
+
+.pagination li a.active {
+  background-color: var(--primary-color);
+  color: white;
+}
