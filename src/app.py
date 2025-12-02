@@ -235,7 +235,7 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
-        return render_template("login.html")
+        return render_template("login.html", filled={})
 
     if request.method == "POST":
         username = request.form.get("username")
@@ -250,7 +250,7 @@ def login():
             return redirect("/")
         else:
             flash("Väärä tunnus tai salasana", "error")
-            return redirect("/login")
+            return render_template("login.html", filled={"username": username})
 
 
 @app.route("/logout")

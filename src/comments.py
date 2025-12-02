@@ -15,7 +15,6 @@ def get_comments(destination_id):
              ORDER BY c.id DESC"""
     return db.query(sql, [destination_id])
 
-
 def get_comments_by_user(user_id):
     sql = """SELECT c.comment, c.rating, d.name as destination_name, d.id as destination_id
              FROM comments c
