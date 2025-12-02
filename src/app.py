@@ -247,7 +247,7 @@ def login():
             session["username"] = username
             session["csrf_token"] = secrets.token_hex(16)
             flash("Kirjautuminen onnistui.")
-            return redirect("/profile")
+            return redirect("/")
         else:
             flash("Väärä tunnus tai salasana", "error")
             return redirect("/login")
