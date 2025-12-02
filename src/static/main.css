@@ -95,6 +95,7 @@ textarea {
     border: 2px solid #da190b;
 }
 
+.container,
 .flex {
     display: flex;
 }
