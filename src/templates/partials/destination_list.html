@@ -9,6 +9,10 @@
             <span class="list-rating">
             - keskiarvo: {{ destination.average_rating }}
             </span>
+            {% else %}
+            <span class="list-rating">
+            - ei arvosteluja
+            </span>
             {% endif %}
         </h3>
         <p>{{ destination.description }}</p>

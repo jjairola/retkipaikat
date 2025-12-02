@@ -23,7 +23,7 @@ def get_destinations(
     sql = """
     SELECT d.id, d.name, d.description, d.municipality,
             GROUP_CONCAT(dc.title || ':' || dc.value, ';') classes,
-            SUM(c.rating) / COUNT(c.id) as average_rating
+            ROUND(COALESCE(AVG(c.rating), 0), 1) as average_rating
     FROM destinations d
     LEFT JOIN destination_classes dc ON d.id = dc.destination_id
     LEFT JOIN comments c ON d.id = c.destination_id
