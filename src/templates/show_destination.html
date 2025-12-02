@@ -38,6 +38,13 @@
         <strong>{{ comment_row.created_at }} {{ comment_row.username }}:</strong> Arvosana: {{ comment_row.rating }}
     </span>
     <p>{{ comment_row.comment }}</p>
+
+    {% if session.user_id and session.user_id == comment_row.user_id %}
+    <div class="container">
+        <a class="button" href="/destination/{{destination.id}}/comments/{{ comment_row.id }}/edit" class="button">Muokkaa</a>
+        <a class="button" href="/destination/{{destination.id}}/comments/{{ comment_row.id }}/delete" class="button">Poista</a>
+    </div>
+    {% endif %}
 </div>
 {% endfor %}
 {% else %}
@@ -47,7 +54,7 @@
 
 {% if session.user_id %}
 <h3>Uusi kommentti</h3>
-<form class="mb-4" action="/create-comment" method="post">
+<form class="mb-4" action="/destination/{{ destination.id }}/comments" method="post">
     <label for="comment">Kommentti</label>
     <textarea name="comment" id="comment" required maxlength="500" required></textarea>
     <br>

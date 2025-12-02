@@ -262,8 +262,8 @@ def logout():
     return redirect("/")
 
 
-@app.route("/create-comment", methods=["POST"])
-def create_comment():
+@app.route("/destination/<int:destination_id>/comments", methods=["POST"])
+def create_comment(destination_id):
     utils.require_login()
     utils.check_csrf()
 
@@ -293,6 +293,35 @@ def create_comment():
 
     return redirect(f"/destination/{destination_id}")
 
+@app.route("/destination/<int:destination_id>/comments/<int:comment_id>/delete", methods=["GET", "POST"])
+def delete_comment(destination_id, comment_id):
+    utils.require_login()
+    comment = comments.get_comment(comment_id)
+
+    if not comment or comment["user_id"] != session["user_id"]:
+        abort(403)
+
+    if request.method == "GET":
+        return render_template("delete_comment.html", comment=comment)
+    
+    if request.method == "POST":
+        utils.check_csrf()
+        try:
+            comments.delete_comment(comment_id)
+            ratings_cache.update_cache(destination_id)
+            flash("Kommentti poistettu")
+        except Exception:
+            flash("Virhe kommentin poistamisessa", "error")
+        return redirect(f"/destination/{destination_id}")
+
+    # try:
+    #     comments.delete_comment(comment_id)
+    #     ratings_cache.update_cache(destination_id)
+    #     flash("Kommentti poistettu.")
+    # except Exception as e:
+    #     flash("Virhe kommentin poistamisessa.", "error")
+
+    # return redirect(f"/destination/{destination_id}")
 
 @app.route("/profile")
 def profile():

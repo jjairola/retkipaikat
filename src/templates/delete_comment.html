@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block title %}Poista kommentti {{ comment.id }}{% endblock %}
+
+{% block content %}
+<h2>Poista kommentti: {{ comment.id }}</h2>
+
+<p>Oletko varma, että haluat poistaa tämän kommentin?</p>
+
+<form action="" method="post">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+    <input class="danger" type="submit" value="Kyllä" class="button">
+</form>
+
+{% endblock %}
