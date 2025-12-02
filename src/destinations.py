@@ -79,7 +79,7 @@ def get_destinations(
     results = []
     for row in rows:
         result = dict(row)
-        if row["classes"]:
+        if "classes" in row:
             classes = row["classes"].split(";")
             class_dict = {}
             for class_item in classes:
