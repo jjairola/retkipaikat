@@ -17,8 +17,21 @@ def add_destination(name, description, municipality, user_id, classes):
         db.execute(sql, [destination_id, class_title, class_value])
 
 
+def destination_count():
+    sql = """
+    SELECT COUNT(d.id) as count from destinations d
+    """
+    result = db.query(sql)
+    return result[0]["count"]
+
+
 def get_destinations(
-    user_id=None, destination_id=None, query_text=None, query_class=None
+    user_id=None,
+    destination_id=None,
+    query_text=None,
+    query_class=None,
+    page=None,
+    page_size=None,
 ):
     sql = """
     SELECT d.id, d.name, d.description, d.municipality,
@@ -52,6 +65,13 @@ def get_destinations(
     GROUP BY d.id
     ORDER BY average_rating DESC
     """
+
+    if page is not None and page_size is not None:
+        limit = page_size
+        offset = page_size * (page - 1)
+
+        sql += "LIMIT ? OFFSET ?"
+        params = [limit, offset]
 
     rows = db.query(sql, params)
 
@@ -94,6 +114,7 @@ def search_destionations_by_class(title, value):
 def get_destination_classes(destination_id):
     sql = "SELECT title, value FROM destination_classes WHERE destination_id = ?"
     return dict(db.query(sql, [destination_id]))
+
 
 def update_destination(destination_id, name, description, municipality, classes):
     sql = """UPDATE destinations SET name = ?, description = ?, municipality = ? WHERE id = ?"""

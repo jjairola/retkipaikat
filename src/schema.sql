@@ -6,7 +6,7 @@ CREATE TABLE users (
 
 CREATE TABLE destinations (
     id INTEGER PRIMARY KEY,
-    name TEXT,
+    name TEXT NOT NULL,
     description TEXT,
     municipality TEXT,
     user_id INTEGER REFERENCES users

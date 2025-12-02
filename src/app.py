@@ -6,7 +6,7 @@ import config
 import users
 import destinations
 import comments
-
+import math
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -14,10 +14,23 @@ app.add_template_filter(utils.show_lines, name="show_lines")
 
 
 @app.route("/")
-def index():
-    destinations_list = destinations.get_destinations()
+@app.route("/<int:page>")
+def index(page=1):
+    page_size = 10
+    destination_count = destinations.destination_count()
+    page_count = math.ceil(destination_count / page_size)
+    page_count = max(page_count, 1)
+
+    if page < 1:
+        return redirect("/1")
+    if page > page_count:
+        return redirect("/" + str(page_count))
+
+    destinations_list = destinations.get_destinations(page=page, page_size=page_size)
     print(destinations_list)
-    return render_template("index.html", destinations=destinations_list)
+    return render_template(
+        "index.html", destinations=destinations_list, page=page, page_count=page_count
+    )
 
 
 @app.route("/find-destination")
