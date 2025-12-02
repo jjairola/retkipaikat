@@ -288,7 +288,7 @@ def create_comment():
 @app.route("/profile")
 def profile():
     utils.require_login()
-    user_destinations = destinations.get_destinations_by_user(session["user_id"])
+    user_destinations = destinations.get_destinations(user_id=session["user_id"])
     comments_list = comments.get_comments_by_user(session["user_id"])
     return render_template(
         "profile.html", destinations=user_destinations, comments=comments_list

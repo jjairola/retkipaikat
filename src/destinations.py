@@ -1,20 +1,8 @@
 import db
 
+
 class DestinationError(Exception):
     pass
-
-
-def get_all_classes():
-    sql = "SELECT title, value FROM classes ORDER BY id"
-    result = db.query(sql)
-
-    classes = {}
-    for title, value in result:
-        classes[title] = []
-    for title, value in result:
-        classes[title].append(value)
-
-    return classes
 
 
 def add_destination(name, description, municipality, user_id, classes):
@@ -29,31 +17,33 @@ def add_destination(name, description, municipality, user_id, classes):
         db.execute(sql, [destination_id, class_title, class_value])
 
 
-def get_destinations_by_user(user_id):
+def get_destinations(user_id=None, destination_id=None):
     sql = """
-    SELECT d.id, d.name, d.description, d.municipality, GROUP_CONCAT(dc.title) classes
-    FROM destinations d
-    LEFT JOIN destination_classes dc ON d.id = dc.destination_id
-    WHERE d.user_id = ?
-    GROUP BY d.id
-    ORDER BY d.id
-    """
-    return db.query(sql, [user_id])
-
-
-def get_destinations():
-    sql = """
-    SELECT d.id, d.name, d.description, d.municipality, 
+    SELECT d.id, d.name, d.description, d.municipality,
             GROUP_CONCAT(dc.title || ':' || dc.value, ';') classes,
             SUM(c.rating) / COUNT(c.id) as average_rating
     FROM destinations d
     LEFT JOIN destination_classes dc ON d.id = dc.destination_id
     LEFT JOIN comments c ON d.id = c.destination_id
+    """
+
+    # where(s)
+
+    params = []
+    if user_id is not None:
+        sql += "WHERE d.user_id = ? "
+        params = [user_id]
+
+    if destination_id is not None:
+        sql += "WHERE d.id = ? "
+        params = [destination_id]
+
+    sql += """
     GROUP BY d.id
     ORDER BY average_rating DESC
     """
 
-    rows = db.query(sql)
+    rows = db.query(sql, params)
 
     results = []
     for row in rows:
@@ -77,13 +67,7 @@ def get_destinations():
 
 
 def get_destination(destination_id):
-    sql = """
-    SELECT d.id, d.name, d.description, d.municipality, u.username, u.id as user_id
-    FROM destinations d
-    JOIN users u ON d.user_id = u.id
-    WHERE d.id = ?
-    """
-    result = db.query(sql, [destination_id])
+    result = get_destinations(destination_id=destination_id)
     return result[0] if result else None
 
 
@@ -142,3 +126,16 @@ def delete_destination(destination_id):
 
     sql = "DELETE FROM destinations WHERE id = ?"
     db.execute(sql, [destination_id])
+
+
+def get_all_classes():
+    sql = "SELECT title, value FROM classes ORDER BY id"
+    result = db.query(sql)
+
+    classes = {}
+    for title, value in result:
+        classes[title] = []
+    for title, value in result:
+        classes[title].append(value)
+
+    return classes
