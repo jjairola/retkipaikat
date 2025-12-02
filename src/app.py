@@ -1,3 +1,4 @@
+from fileinput import filelineno
 from flask import Flask, abort
 from flask import flash, redirect, render_template, request, session
 import utils
@@ -203,24 +204,24 @@ def delete_destination(destination_id):
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "GET":
-        return render_template("register.html")
+        return render_template("register.html", filled={})
 
     if request.method == "POST":
         username = request.form.get("username")
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
 
-        if password1 != password2:
-            flash("Salasanat eivät täsmää.", "error")
-            return redirect("/register")
-
         if len(username) < 5 or len(username) > 20:
             flash("Käyttäjätunnuksen oltava 5-20 merkkiä pitkä.", "error")
-            return redirect("/register")
+            return render_template("register.html", filled={"username": username})
 
+        if password1 != password2:
+            flash("Salasanat eivät täsmää.", "error")
+            return render_template("register.html", filled={"username": username})
+        
         if len(password1) < 8 or len(password1) > 20:
             flash("Salasanan oltava 8-20 merkkiä pitkä.", "error")
-            return redirect("/register")
+            return render_template("register.html", filled={"username": username})
 
         try:
             users.create_user(username, password1)
