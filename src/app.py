@@ -34,7 +34,7 @@ def find_destination():
         results = destinations.search_destinations_by_query(query_text)
     elif query_class:
         title, value = query_class.split(":", 1)
-        results = destinations.get_destinations_by_class(title, value)
+        results = destinations.search_destionations_by_class(title, value)
 
     return render_template(
         "find_destination.html",

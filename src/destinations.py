@@ -17,7 +17,9 @@ def add_destination(name, description, municipality, user_id, classes):
         db.execute(sql, [destination_id, class_title, class_value])
 
 
-def get_destinations(user_id=None, destination_id=None):
+def get_destinations(
+    user_id=None, destination_id=None, query_text=None, query_class=None
+):
     sql = """
     SELECT d.id, d.name, d.description, d.municipality,
             GROUP_CONCAT(dc.title || ':' || dc.value, ';') classes,
@@ -37,6 +39,14 @@ def get_destinations(user_id=None, destination_id=None):
     if destination_id is not None:
         sql += "WHERE d.id = ? "
         params = [destination_id]
+
+    if query_text is not None:
+        sql += "WHERE (d.name LIKE ? OR d.description LIKE ?) "
+        params = [f"%{query_text}%", f"%{query_text}%"]
+
+    if query_class is not None:
+        sql += "WHERE dc.title = ? AND dc.value = ? "
+        params = [query_class["title"], query_class["value"]]
 
     sql += """
     GROUP BY d.id
@@ -72,38 +82,18 @@ def get_destination(destination_id):
 
 
 def search_destinations_by_query(query: str):
-    sql = """
-    SELECT d.id, d.name, d.description, d.municipality
-    FROM destinations d
-    WHERE (d.name LIKE ? OR d.description LIKE ?)
-    """
-    return db.query(sql, [f"%{query}%", f"%{query}%"])
+    result = get_destinations(query_text=query)
+    return result
 
 
-def get_destinations_by_class(title, value):
-    sql = """
-    SELECT d.id, d.name, d.description, d.municipality
-    FROM destinations d
-    JOIN destination_classes dc ON d.id = dc.destination_id
-    WHERE dc.title = ? AND dc.value = ?
-    """
-    return db.query(sql, [title, value])
+def search_destionations_by_class(title, value):
+    result = get_destinations(query_class={"title": title, "value": value})
+    return result
 
 
 def get_destination_classes(destination_id):
     sql = "SELECT title, value FROM destination_classes WHERE destination_id = ?"
     return dict(db.query(sql, [destination_id]))
-
-
-def get_destination_classifications_ids(destination_id):
-    sql = """
-    SELECT classification_id
-    FROM destination_classifications
-    WHERE destination_id = ?
-    """
-    result = db.query(sql, [destination_id])
-    return [row["classification_id"] for row in result]
-
 
 def update_destination(destination_id, name, description, municipality, classes):
     sql = """UPDATE destinations SET name = ?, description = ?, municipality = ? WHERE id = ?"""
