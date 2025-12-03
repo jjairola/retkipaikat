@@ -150,6 +150,10 @@ def edit_destination(destination_id):
     if request.method == "POST":
         utils.check_csrf()
 
+        actions = request.form.get("action")
+        if actions == "cancel":
+            return redirect(url_for("get_destination", destination_id=destination_id))
+
         name = request.form.get("name")
         description = request.form.get("description")
         municipality = request.form.get("municipality")
@@ -195,7 +199,7 @@ def delete_destination(destination_id):
         action = request.form.get("action")
         if action == "cancel":
             return redirect(url_for("get_destination", destination_id=destination_id))
-        
+
         try:
             destinations.delete_destination(destination_id)
             flash("Retkipaikka poistettu.")

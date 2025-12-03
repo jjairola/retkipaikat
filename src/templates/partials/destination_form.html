@@ -1,4 +1,4 @@
-<form class="mb-4" action="{{ action_url }}" method="post">
+<form class="mb-4" method="post">
     <div>
         <label for="name">Nimi</label>
         <input id="name" type="text" name="name" value="{{ destination.name }}" required minlength="5" maxlength="80" />
@@ -31,7 +31,11 @@
         </p>
         {% endfor %}
     </div>
+    
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
 
-    <input type="submit" value="{{ submit_text }}">
+    {% if edit %}
+    <button type="submit" name="action" value="cancel">Peruuta</button>
+    {% endif %}
+    <button type="submit" name="action" value="update">{{ submit_text }}</button>
 </form>
