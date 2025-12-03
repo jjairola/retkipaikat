@@ -16,10 +16,10 @@
 <h2>Etsi retkipaikkaa luokituksella</h2>
 
 
-{% for class_name, values in classes.items() %}
-    <h3>{{ class_name }}</h3>
+{% for title, values in classes.items() %}
+    <h3>{{ title }}</h3>
     {% for value in values %}
-        <a href="{{ url_for('search_destination', class=class_name + ':' + value) }}">{{value}}</a>
+        <a href="{{ url_for('search_destination', class=title + ':' + value.value) }}">{{value.value}} ({{value.count}})</a>
     {% endfor %}
 {% endfor %}
 

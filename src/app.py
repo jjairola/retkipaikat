@@ -35,7 +35,7 @@ def index(page=1):
 
 @app.route("/search-destination")
 def search_destination():
-    classes = destinations.get_all_classes()
+    classes = destinations.get_all_classes_with_count()
 
     query_text = request.args.get("query", "")
     query_class = request.args.get("class", "")
