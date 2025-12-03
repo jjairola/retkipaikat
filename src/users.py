@@ -12,7 +12,7 @@ def get_user(user_id):
     return result[0] if result else None
 
 
-def create_user(username, password):
+def add_user(username, password):
     try:
         password_hash = generate_password_hash(password, method="pbkdf2:sha256")
         sql = "INSERT INTO users (username, password_hash) VALUES (?, ?)"

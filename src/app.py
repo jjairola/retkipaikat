@@ -224,7 +224,7 @@ def register():
             return render_template("register.html", filled={"username": username})
 
         try:
-            users.create_user(username, password1)
+            users.add_user(username, password1)
             flash("Käyttäjätili luotu. Voit kirjautua sisään!")
             return redirect(url_for("login"))
 
@@ -263,7 +263,7 @@ def logout():
 
 
 @app.route("/destination/<int:destination_id>/comments", methods=["POST"])
-def create_comment(destination_id):
+def add_comment(destination_id):
     utils.require_login()
     utils.check_csrf()
 
