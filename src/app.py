@@ -61,8 +61,6 @@ def get_destination(destination_id):
     classes = destinations.get_destination_classes(destination_id)
     comments_list = comments.get_comments(destination_id)
 
-    print(dict(destination))
-
     if not destination:
         abort(404)
     return render_template(
@@ -192,6 +190,12 @@ def delete_destination(destination_id):
         return render_template("delete_destination.html", destination=destination)
 
     if request.method == "POST":
+        utils.check_csrf()
+
+        action = request.form.get("action")
+        if action == "cancel":
+            return redirect(url_for("get_destination", destination_id=destination_id))
+        
         try:
             destinations.delete_destination(destination_id)
             flash("Retkipaikka poistettu.")
