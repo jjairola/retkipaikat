@@ -22,6 +22,7 @@
 </div>
 
 {% if session.user_id and session.user_id == destination.user_id %}
+
 <div class="container">
     <a class="button" href="/destination/{{ destination.id }}/edit" class="button">Muokkaa</a>
     <a class="button" href="/destination/{{ destination.id }}/delete" class="button">Poista</a>

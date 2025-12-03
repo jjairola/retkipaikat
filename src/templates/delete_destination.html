@@ -7,9 +7,12 @@
 
 <p>Oletko varma, että haluat poistaa tämän retkipaikan?</p>
 
-<form action="/destination/{{ destination.id }}/delete" method="post">
-    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-    <input class="danger" type="submit" value="Kyllä" class="button">
-</form>
+<div class="container">
+    <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        <button class="button" name="action" type="submit" value="cancel">Peruuta</button>
+        <button class="danger" name="action" type="submit" value="delete">Kyllä</button>
+    </form>
+</div>
 
 {% endblock %}

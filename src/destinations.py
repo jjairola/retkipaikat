@@ -34,7 +34,7 @@ def get_destinations(
     page_size=None,
 ):
     sql = """
-    SELECT d.id, d.name, d.description, d.municipality,
+    SELECT d.id, d.name, d.description, d.municipality, d.user_id,
             GROUP_CONCAT(dc.title || ':' || dc.value, ';') classes,
             rc.average_rating
     FROM destinations d
