@@ -7,12 +7,6 @@
 
 <p>Oletko varma, että haluat poistaa tämän retkipaikan?</p>
 
-<div class="container">
-    <form method="post">
-        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-        <button class="button" name="action" type="submit" value="cancel">Peruuta</button>
-        <button class="danger" name="action" type="submit" value="delete">Kyllä</button>
-    </form>
-</div>
+{% include "partials/delete_form.html" %}
 
 {% endblock %}
