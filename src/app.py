@@ -45,7 +45,7 @@ def search_destination():
         results = destinations.search_destinations_by_query(query_text)
     elif query_class:
         title, value = query_class.split(":", 1)
-        results = destinations.search_destinations_by_class(title, value)
+        results = destinations.search_destionations_by_class(title, value)
 
     return render_template(
         "search_destination.html",
@@ -275,9 +275,8 @@ def add_comment(destination_id):
     utils.require_login()
     utils.check_csrf()
 
-    destination_id = request.form.get("destination_id")
     comment = request.form.get("comment")
-    rating = request.form.get("rating")
+    rating = utils.parse_int(request.form.get("rating"))
 
     if not comment or len(comment) < 1 or len(comment) > 500:
         flash("Kommentin pitää olla 1-500 merkkiä pitkä.", "error")
