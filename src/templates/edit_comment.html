@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block title %}Muokkaa kommenttia {{ comment.id }}{% endblock %}
+
+{% block content %}
+<h2>Muokkaa kommenttia: {{ comment.id }}</h2>
+
+{% with submit_text="Tallenna muutokset", edit=True %}
+{% include "partials/comment_form.html" %}
+{% endwith %}
+
+{% endblock %}

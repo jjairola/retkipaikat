@@ -57,16 +57,11 @@
 
 {% if session.user_id %}
 <h3>Uusi kommentti</h3>
-<form class="mb-4" action="/destination/{{ destination.id }}/comments" method="post">
-    <label for="comment">Kommentti</label>
-    <textarea name="comment" id="comment" required maxlength="500" required></textarea>
-    <br>
-    <label for="rating">Arvosana (1-5)</label>
-    <input type="number" name="rating" id="rating" min="1" max="5" required /><br>
-    <input type="hidden" name="destination_id" value="{{ destination.id }}">
-    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
-    <input type="submit" value="Lähetä" />
-</form>
+
+{% with action_url="/destination/" ~ destination.id ~ "/comments", submit_text="Lähetä" %}
+{% include "partials/comment_form.html" %}
+{% endwith %}
+
 {% endif %}
 
 

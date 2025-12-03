@@ -285,6 +285,7 @@ def add_comment(destination_id):
     if not rating or int(rating) < 1 or int(rating) > 5:
         flash("Arvion pitää olla välillä 1-5.", "error")
         return redirect(url_for("get_destination", destination_id=destination_id))
+    
     try:
         comments.add_comment(
             destination_id,
@@ -299,6 +300,49 @@ def add_comment(destination_id):
         flash("Virhe kommentin lisäämisessä.", "error")
 
     return redirect(url_for("get_destination", destination_id=destination_id))
+
+
+@app.route(
+    "/destination/<int:destination_id>/comments/<int:comment_id>/edit",
+    methods=["GET", "POST"],
+)
+def edit_comment(destination_id, comment_id):
+    utils.require_login()
+    comment = comments.get_comment(comment_id)
+
+    if not comment or comment["user_id"] != session["user_id"]:
+        abort(403)
+
+    if request.method == "GET":
+        return render_template(
+            "edit_comment.html", comment=comment, destination_id=destination_id
+        )
+
+    if request.method == "POST":
+        utils.check_csrf()
+
+        action = request.form.get("action")
+        if action == "cancel":
+            return redirect(url_for("get_destination", destination_id=destination_id))
+            
+        comment = request.form.get("comment")
+        rating = utils.parse_int(request.form.get("rating"))
+
+        if not comment or len(comment) < 1 or len(comment) > 500:
+            flash("Kommentin pitää olla 1-500 merkkiä pitkä.", "error")
+            return redirect(url_for("get_destination", destination_id=destination_id))
+
+        if not rating or int(rating) < 1 or int(rating) > 5:
+            flash("Arvion pitää olla välillä 1-5.", "error")
+            return redirect(url_for("get_destination", destination_id=destination_id))
+
+        try:
+            comments.update_comment(comment_id, comment, rating)
+            ratings_cache.update_cache(destination_id)
+            flash("Kommentti päivitetty")
+        except Exception:
+            flash("Virhe kommentin päivittämisessä", "error")
+        return redirect(url_for("get_destination", destination_id=destination_id))
 
 
 @app.route(

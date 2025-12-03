@@ -1,11 +1,22 @@
 import db
 
 
+class CommentError(Exception):
+    pass
+
+
+
 def add_comment(destination_id, user_id, comment, rating):
     sql = """INSERT INTO comments (destination_id, user_id, comment, rating)
              VALUES (?, ?, ?, ?)"""
     db.execute(sql, [destination_id, user_id, comment, rating])
 
+def update_comment(comment_id, comment, rating):
+    try:
+        sql = """UPDATE comments SET comment = ?, rating = ? WHERE id = ?"""
+        db.execute(sql, [comment, rating, comment_id])
+    except Exception as e:
+        raise CommentError(e)
 
 def get_comments(destination_id):
     sql = """SELECT c.id, c.created_at, c.comment, c.rating, u.id user_id, u.username
