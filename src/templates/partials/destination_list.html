@@ -3,15 +3,16 @@
         <img src="/static/placeholder.png" alt="{{ destination.name }}" class="w-full h-auto rounded">
     </div>
     <div class="flex-1">
-        <h3><a href="/destination/{{ destination.id }}" class="text-blue-600 hover:underline">{{ destination.name }}
+        <h3><a href="{{ url_for('destination_page', destination_id=destination.id) }}"
+                class="text-blue-600 hover:underline">{{ destination.name }}
             </a>
             {% if destination.average_rating %}
             <span class="list-rating">
-            - keskiarvo: {{ destination.average_rating }}
+                - keskiarvo: {{ destination.average_rating }}
             </span>
             {% else %}
             <span class="list-rating">
-            - ei arvosteluja
+                - ei arvosteluja
             </span>
             {% endif %}
         </h3>
