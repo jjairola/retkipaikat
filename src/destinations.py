@@ -6,17 +6,20 @@ class DestinationError(Exception):
 
 
 def add_destination(name, description, municipality, user_id, classes):
-    sql = """INSERT INTO destinations (name, description, municipality, user_id)
-             VALUES (?, ?, ?, ?)"""
-    db.execute(sql, [name, description, municipality, user_id])
+    try:
+        sql = """INSERT INTO destinations (name, description, municipality, user_id)
+                VALUES (?, ?, ?, ?)"""
+        db.execute(sql, [name, description, municipality, user_id])
 
-    destination_id = db.last_insert_id()
+        destination_id = db.last_insert_id()
 
-    sql = "INSERT INTO destination_classes (destination_id, title, value) VALUES (?, ?, ?)"
-    for class_title, class_value in classes:
-        db.execute(sql, [destination_id, class_title, class_value])
-    
-    return destination_id
+        sql = "INSERT INTO destination_classes (destination_id, title, value) VALUES (?, ?, ?)"
+        for class_title, class_value in classes:
+            db.execute(sql, [destination_id, class_title, class_value])
+        
+        return destination_id
+    except Exception as e:
+        raise DestinationError(e)
 
 
 def destination_count():
@@ -118,26 +121,32 @@ def get_destination_classes(destination_id):
 
 
 def update_destination(destination_id, name, description, municipality, classes):
-    sql = """UPDATE destinations SET name = ?, description = ?, municipality = ? WHERE id = ?"""
-    db.execute(sql, [name, description, municipality, destination_id])
+    try:
+        sql = """UPDATE destinations SET name = ?, description = ?, municipality = ? WHERE id = ?"""
+        db.execute(sql, [name, description, municipality, destination_id])
 
-    sql = "DELETE FROM destination_classes WHERE destination_id = ?"
-    db.execute(sql, [destination_id])
+        sql = "DELETE FROM destination_classes WHERE destination_id = ?"
+        db.execute(sql, [destination_id])
 
-    sql = "INSERT INTO destination_classes (destination_id, title, value) VALUES (?, ?, ?)"
-    for class_title, class_value in classes:
-        db.execute(sql, [destination_id, class_title, class_value])
+        sql = "INSERT INTO destination_classes (destination_id, title, value) VALUES (?, ?, ?)"
+        for class_title, class_value in classes:
+            db.execute(sql, [destination_id, class_title, class_value])
+    except Exception as e:
+        raise DestinationError(e)
 
 
 def delete_destination(destination_id):
-    sql = "DELETE FROM comments WHERE destination_id = ?"
-    db.execute(sql, [destination_id])
+    try:
+        sql = "DELETE FROM comments WHERE destination_id = ?"
+        db.execute(sql, [destination_id])
 
-    sql = "DELETE FROM destination_classes WHERE destination_id = ?"
-    db.execute(sql, [destination_id])
+        sql = "DELETE FROM destination_classes WHERE destination_id = ?"
+        db.execute(sql, [destination_id])
 
-    sql = "DELETE FROM destinations WHERE id = ?"
-    db.execute(sql, [destination_id])
+        sql = "DELETE FROM destinations WHERE id = ?"
+        db.execute(sql, [destination_id])
+    except Exception as e:
+        raise DestinationError(e)
 
 
 def get_all_classes():
