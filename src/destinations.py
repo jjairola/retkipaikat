@@ -46,21 +46,21 @@ def get_destinations(
     # where(s)
 
     params = []
-    # if user_id is not None:
-    #     sql += "WHERE d.user_id = ? "
-    #     params = [user_id]
+    if user_id is not None:
+        sql += "WHERE d.user_id = ? "
+        params = [user_id]
 
-    # if destination_id is not None:
-    #     sql += "WHERE d.id = ? "
-    #     params = [destination_id]
+    if destination_id is not None:
+        sql += "WHERE d.id = ? "
+        params = [destination_id]
 
-    # if query_text is not None:
-    #     sql += "WHERE (d.name LIKE ? OR d.description LIKE ?) "
-    #     params = [f"%{query_text}%", f"%{query_text}%"]
+    if query_text is not None:
+        sql += "WHERE (d.name LIKE ? OR d.description LIKE ?) "
+        params = [f"%{query_text}%", f"%{query_text}%"]
 
-    # if query_class is not None:
-    #     sql += "WHERE dc.title = ? AND dc.value = ? "
-    #     params = [query_class["title"], query_class["value"]]
+    if query_class is not None:
+        sql += "WHERE dc.title = ? AND dc.value = ? "
+        params = [query_class["title"], query_class["value"]]
 
     sql += """
     GROUP BY d.id

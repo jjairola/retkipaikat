@@ -57,6 +57,10 @@ input[type="submit"]:hover {
     transition: opacity 0.3s;
 }
 
+button.danger {
+    background-color: #e74c3c;
+}
+
 label {
     display: block;
     margin-bottom: 5px;

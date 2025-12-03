@@ -32,17 +32,19 @@
 
 {% if comments %}
 <h3>Kommentit</h3>
-{% for comment_row in comments %}
+{% for comment in comments %}
 <div class="comment">
     <span>
-        <strong>{{ comment_row.created_at }} {{ comment_row.username }}:</strong> Arvosana: {{ comment_row.rating }}
+        <strong>{{ comment.created_at }} {{ comment.username }}:</strong> Arvosana: {{ comment.rating }}
     </span>
-    <p>{{ comment_row.comment }}</p>
+    <p>{{ comment.comment }}</p>
 
-    {% if session.user_id and session.user_id == comment_row.user_id %}
+    {% if session.user_id and session.user_id == comment.user_id %}
     <div class="container">
-        <a class="button" href="/destination/{{destination.id}}/comments/{{ comment_row.id }}/edit" class="button">Muokkaa</a>
-        <a class="button" href="/destination/{{destination.id}}/comments/{{ comment_row.id }}/delete" class="button">Poista</a>
+        <a class="button" href="/destination/{{destination.id}}/comments/{{ comment.id }}/edit"
+            class="button">Muokkaa</a>
+        <a class="button" href="/destination/{{destination.id}}/comments/{{ comment.id }}/delete"
+            class="button">Poista</a>
     </div>
     {% endif %}
 </div>

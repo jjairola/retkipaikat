@@ -1,4 +1,3 @@
-from fileinput import filelineno
 from flask import Flask, abort
 from flask import flash, redirect, render_template, request, session
 import utils
@@ -61,6 +60,8 @@ def destination_page(destination_id):
     destination = destinations.get_destination(destination_id)
     classes = destinations.get_destination_classes(destination_id)
     comments_list = comments.get_comments(destination_id)
+
+    print(dict(destination))
 
     if not destination:
         abort(404)
@@ -289,6 +290,7 @@ def create_comment(destination_id):
         ratings_cache.update_cache(destination_id)
         flash("Kommentti lisätty.")
     except Exception as e:
+        print(e)
         flash("Virhe kommentin lisäämisessä.", "error")
 
     return redirect(f"/destination/{destination_id}")
@@ -306,6 +308,11 @@ def delete_comment(destination_id, comment_id):
     
     if request.method == "POST":
         utils.check_csrf()
+
+        action = request.form.get("action")
+        if action == "cancel":
+            return redirect(f"/destination/{destination_id}")
+
         try:
             comments.delete_comment(comment_id)
             ratings_cache.update_cache(destination_id)
@@ -313,15 +320,6 @@ def delete_comment(destination_id, comment_id):
         except Exception:
             flash("Virhe kommentin poistamisessa", "error")
         return redirect(f"/destination/{destination_id}")
-
-    # try:
-    #     comments.delete_comment(comment_id)
-    #     ratings_cache.update_cache(destination_id)
-    #     flash("Kommentti poistettu.")
-    # except Exception as e:
-    #     flash("Virhe kommentin poistamisessa.", "error")
-
-    # return redirect(f"/destination/{destination_id}")
 
 @app.route("/profile")
 def profile():
