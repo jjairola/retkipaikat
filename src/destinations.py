@@ -15,6 +15,8 @@ def add_destination(name, description, municipality, user_id, classes):
     sql = "INSERT INTO destination_classes (destination_id, title, value) VALUES (?, ?, ?)"
     for class_title, class_value in classes:
         db.execute(sql, [destination_id, class_title, class_value])
+    
+    return destination_id
 
 
 def destination_count():

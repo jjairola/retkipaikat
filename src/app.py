@@ -73,7 +73,7 @@ def destination_page(destination_id):
     )
 
 
-@app.route("/add-destination", methods=["GET", "POST"])
+@app.route("/destination/add", methods=["GET", "POST"])
 def add_destination():
     utils.require_login()
     all_classes = destinations.get_all_classes()
@@ -115,7 +115,7 @@ def add_destination():
                 classes.append((class_title, class_value))
 
         try:
-            destinations.add_destination(
+            destination_id = destinations.add_destination(
                 name,
                 description,
                 municipality,
@@ -123,10 +123,10 @@ def add_destination():
                 classes,
             )
             flash("Retkipaikka lisätty onnistuneesti.")
-            return redirect("/")
+            return redirect(f"/destination/{destination_id}")
         except Exception as e:
             flash("Virhe retkipaikan lisäämisessä.", "error")
-            return redirect("/add-destination")
+            return redirect("/destination/add")
 
 
 @app.route("/destination/<int:destination_id>/edit", methods=["GET", "POST"])
