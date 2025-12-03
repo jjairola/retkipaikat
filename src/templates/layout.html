@@ -11,15 +11,15 @@
   <nav class="max-800">
 
     <ul class="nav-links">
-      <li><a class="button" href="/">Etusivu</a></li>
-      <li><a class="button" href="/find-destination">Etsi retkipaikka</a></li>
+      <li><a class="button" href="{{ url_for('index') }}">Etusivu</a></li>
+      <li><a class="button" href="{{ url_for('search_destination') }}">Etsi retkipaikka</a></li>
       {% if session.user_id %}
-      <li><a class="button" href="/destination/add">Uusi retkipaikka</a></li>
-      <li><a class="button" href="/profile">Profiili</a></li>
-      <li><a class="button" href="/logout">Kirjaudu ulos</a></li>
+      <li><a class="button" href="{{ url_for('add_destination') }}">Uusi retkipaikka</a></li>
+      <li><a class="button" href="{{ url_for('profile') }}">Profiili</a></li>
+      <li><a class="button" href="{{ url_for('logout') }}">Kirjaudu ulos</a></li>
       {% else %}
-      <li><a class="button" href="/login">Kirjaudu sisään</a></li>
-      <li><a class="button" href="/register">Luo tunnus</a></li>
+      <li><a class="button" href="{{ url_for('login') }}">Kirjaudu sisään</a></li>
+      <li><a class="button" href="{{ url_for('register') }}">Luo tunnus</a></li>
       {% endif %}
     </ul>
 
@@ -30,9 +30,9 @@
 
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-      {% for category, message in messages %}
-      <div class="toast {{ category }}">{{ message }}</div>
-      {% endfor %}
+    {% for category, message in messages %}
+    <div class="toast {{ category }}">{{ message }}</div>
+    {% endfor %}
     {% endif %}
     {% endwith %}
 

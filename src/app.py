@@ -1,4 +1,4 @@
-from flask import Flask, abort
+from flask import Flask, abort, url_for
 from flask import flash, redirect, render_template, request, session
 import utils
 import secrets
@@ -33,8 +33,8 @@ def index(page=1):
     )
 
 
-@app.route("/find-destination")
-def find_destination():
+@app.route("/search-destination")
+def search_destination():
     classes = destinations.get_all_classes()
 
     query_text = request.args.get("query", "")
@@ -48,7 +48,7 @@ def find_destination():
         results = destinations.search_destionations_by_class(title, value)
 
     return render_template(
-        "find_destination.html",
+        "search_destination.html",
         classes=classes,
         query=query_text,
         results=results,
@@ -56,7 +56,7 @@ def find_destination():
 
 
 @app.route("/destination/<int:destination_id>")
-def destination_page(destination_id):
+def get_destination(destination_id):
     destination = destinations.get_destination(destination_id)
     classes = destinations.get_destination_classes(destination_id)
     comments_list = comments.get_comments(destination_id)
@@ -92,17 +92,17 @@ def add_destination():
         name = request.form.get("name")
         if not name or len(name) < 5 or len(name) > 80:
             flash("Nimen pitää olla 5-80 merkkiä pitkä.", "error")
-            return redirect("/add-destination")
+            return redirect(url_for("add_destination"))
 
         description = request.form.get("description")
         if not description or len(description) < 10 or len(description) > 500:
             flash("Kuvauksen pitää olla 10-500 merkkiä pitkä.", "error")
-            return redirect("/add-destination")
+            return redirect(url_for("add_destination"))
 
         municipality = request.form.get("municipality")
         if not municipality:
             flash("Paikkakunta ei voi olla tyhjä.", "error")
-            return redirect("/add-destination")
+            return redirect(url_for("add_destination"))
 
         classes = []
         for entry in request.form.getlist("classes"):
@@ -123,10 +123,10 @@ def add_destination():
                 classes,
             )
             flash("Retkipaikka lisätty onnistuneesti.")
-            return redirect(f"/destination/{destination_id}")
-        except Exception as e:
+            return redirect(url_for("get_destination", destination_id=destination_id))
+        except Exception:
             flash("Virhe retkipaikan lisäämisessä.", "error")
-            return redirect("/destination/add")
+            return redirect(url_for("add_destination"))
 
 
 @app.route("/destination/<int:destination_id>/edit", methods=["GET", "POST"])
@@ -175,11 +175,10 @@ def edit_destination(destination_id):
                 classes,
             )
             flash("Retkipaikka päivitetty.")
-            return redirect(f"/destination/{destination_id}")
-        except Exception as e:
-            # flash("Virhe retkipaikan päivityksessä.", "error")
-            flash(e)
-            return redirect(f"/destination/{destination_id}/edit")
+            return redirect(url_for("get_destination", destination_id=destination_id))
+        except Exception:
+            flash("Virhe retkipaikan päivityksessä.", "error")
+            return redirect(url_for("edit_destination", destination_id=destination_id))
 
 
 @app.route("/destination/<int:destination_id>/delete", methods=["GET", "POST"])
@@ -199,7 +198,7 @@ def delete_destination(destination_id):
             return redirect("/")
         except Exception:
             flash("Virhe retkipaikan poistamisessa.", "error")
-            return redirect(f"/destination/{destination_id}")
+            return redirect(url_for("get_destination", destination_id=destination_id))
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -219,7 +218,7 @@ def register():
         if password1 != password2:
             flash("Salasanat eivät täsmää.", "error")
             return render_template("register.html", filled={"username": username})
-        
+
         if len(password1) < 8 or len(password1) > 20:
             flash("Salasanan oltava 8-20 merkkiä pitkä.", "error")
             return render_template("register.html", filled={"username": username})
@@ -227,11 +226,11 @@ def register():
         try:
             users.create_user(username, password1)
             flash("Käyttäjätili luotu. Voit kirjautua sisään!")
-            return redirect("/login")
+            return redirect(url_for("login"))
 
         except users.UserError:
             flash("Rekisteröitymisessä tapahtui virhe.", "error")
-            return redirect("/register")
+            return redirect(url_for("register"))
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -249,7 +248,7 @@ def login():
             session["username"] = username
             session["csrf_token"] = secrets.token_hex(16)
             flash("Kirjautuminen onnistui.")
-            return redirect("/")
+            return redirect(url_for("index"))
         else:
             flash("Väärä tunnus tai salasana", "error")
             return render_template("login.html", filled={"username": username})
@@ -260,7 +259,7 @@ def logout():
     if "user_id" in session:
         del session["user_id"]
         del session["username"]
-    return redirect("/")
+    return redirect(url_for("index"))
 
 
 @app.route("/destination/<int:destination_id>/comments", methods=["POST"])
@@ -274,12 +273,11 @@ def create_comment(destination_id):
 
     if not comment or len(comment) < 1 or len(comment) > 500:
         flash("Kommentin pitää olla 1-500 merkkiä pitkä.", "error")
-        return redirect(f"/destination/{destination_id}")
+        return redirect(url_for("get_destination", destination_id=destination_id))
 
     if not rating or int(rating) < 1 or int(rating) > 5:
         flash("Arvion pitää olla välillä 1-5.", "error")
-        return redirect(f"/destination/{destination_id}")
-
+        return redirect(url_for("get_destination", destination_id=destination_id))
     try:
         comments.add_comment(
             destination_id,
@@ -293,9 +291,13 @@ def create_comment(destination_id):
         print(e)
         flash("Virhe kommentin lisäämisessä.", "error")
 
-    return redirect(f"/destination/{destination_id}")
+    return redirect(url_for("get_destination", destination_id=destination_id))
 
-@app.route("/destination/<int:destination_id>/comments/<int:comment_id>/delete", methods=["GET", "POST"])
+
+@app.route(
+    "/destination/<int:destination_id>/comments/<int:comment_id>/delete",
+    methods=["GET", "POST"],
+)
 def delete_comment(destination_id, comment_id):
     utils.require_login()
     comment = comments.get_comment(comment_id)
@@ -305,13 +307,13 @@ def delete_comment(destination_id, comment_id):
 
     if request.method == "GET":
         return render_template("delete_comment.html", comment=comment)
-    
+
     if request.method == "POST":
         utils.check_csrf()
 
         action = request.form.get("action")
         if action == "cancel":
-            return redirect(f"/destination/{destination_id}")
+            return redirect(url_for("get_destination", destination_id=destination_id))
 
         try:
             comments.delete_comment(comment_id)
@@ -319,7 +321,8 @@ def delete_comment(destination_id, comment_id):
             flash("Kommentti poistettu")
         except Exception:
             flash("Virhe kommentin poistamisessa", "error")
-        return redirect(f"/destination/{destination_id}")
+        return redirect(url_for("get_destination", destination_id=destination_id))
+
 
 @app.route("/profile")
 def profile():

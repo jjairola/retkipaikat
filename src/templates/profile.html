@@ -13,7 +13,7 @@
 <ul>
     {% for destination in destinations %}
     <li>
-        <a href="{{ url_for('destination_page', destination_id=destination.id) }}">{{ destination.name }}</a>
+        <a href="{{ url_for('get_destination', destination_id=destination.id) }}">{{ destination.name }}</a>
     </li>
     {% endfor %}
 </ul>
@@ -27,7 +27,7 @@
 <ul>
     {% for comment in comments %}
     <li>
-        "{{ comment.comment }}" - <a href="{{ url_for('destination_page', destination_id=comment.destination_id) }}">{{
+        "{{ comment.comment }}" - <a href="{{ url_for('get_destination', destination_id=comment.destination_id) }}">{{
             comment.destination_name }}</a>
         {% if comment.rating %} (Rating: {{ comment.rating }}) {% endif %}
     </li>

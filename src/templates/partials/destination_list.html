@@ -3,7 +3,7 @@
         <img src="/static/placeholder.png" alt="{{ destination.name }}" class="w-full h-auto rounded">
     </div>
     <div class="flex-1">
-        <h3><a href="{{ url_for('destination_page', destination_id=destination.id) }}"
+        <h3><a href="{{ url_for('get_destination', destination_id=destination.id) }}"
                 class="text-blue-600 hover:underline">{{ destination.name }}
             </a>
             {% if destination.average_rating %}
