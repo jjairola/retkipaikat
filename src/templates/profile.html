@@ -13,7 +13,7 @@
 <ul>
     {% for destination in destinations %}
     <li>
-        <a href="{{ url_for('get_destination', destination_id=destination.id) }}">{{ destination.name }}</a>
+        <a href="{{ url_for('get_destination', destination_id=destination.id) }}">{{ destination.name }}</a> (Arvostelu: {{ destination.average_rating }})
     </li>
     {% endfor %}
 </ul>
@@ -23,13 +23,17 @@
 
 <h3>Omat kommentit</h3>
 
+<p>
+    Käyttäjällä on yhteensä {{ comments | count }} kommenttia.
+</p>
+
 {% if comments %}
 <ul>
     {% for comment in comments %}
     <li>
         "{{ comment.comment }}" - <a href="{{ url_for('get_destination', destination_id=comment.destination_id) }}">{{
             comment.destination_name }}</a>
-        {% if comment.rating %} (Rating: {{ comment.rating }}) {% endif %}
+        {% if comment.rating %} (Arvostelu: {{ comment.rating }}) {% endif %}
     </li>
     {% endfor %}
 </ul>
