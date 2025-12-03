@@ -45,7 +45,7 @@ def search_destination():
         results = destinations.search_destinations_by_query(query_text)
     elif query_class:
         title, value = query_class.split(":", 1)
-        results = destinations.search_destionations_by_class(title, value)
+        results = destinations.search_destinations_by_class(title, value)
 
     return render_template(
         "search_destination.html",

@@ -110,7 +110,7 @@ def search_destinations_by_query(query: str):
     return result
 
 
-def search_destionations_by_class(title, value):
+def search_destinations_by_class(title, value):
     result = get_destinations(query_class={"title": title, "value": value})
     return result
 
