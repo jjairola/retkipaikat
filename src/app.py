@@ -236,7 +236,11 @@ def register():
             flash("Käyttäjätili luotu. Voit kirjautua sisään!")
             return redirect(url_for("login"))
 
-        except users.UserError:
+        except users.UserAlreadyExists:
+            flash(f"Käyttäjätunnus on jo käytössä. Haluatko <a href=\"{url_for('login')}\">kirjautua sisään?</a>", "error")
+            return redirect(url_for("register"))
+        
+        except Exception:
             flash("Rekisteröitymisessä tapahtui virhe.", "error")
             return redirect(url_for("register"))
 

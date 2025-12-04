@@ -1,8 +1,12 @@
+import sqlite3
 from werkzeug.security import check_password_hash, generate_password_hash
 import db
 
 
 class UserError(Exception):
+    pass
+
+class UserAlreadyExists(Exception):
     pass
 
 
@@ -20,8 +24,10 @@ def add_user(username, password):
         password_hash = generate_password_hash(password, method="pbkdf2:sha256")
         sql = "INSERT INTO users (username, password_hash) VALUES (?, ?)"
         db.execute(sql, [username, password_hash])
-    except Exception as e:
-        raise UserError(e)
+    except sqlite3.IntegrityError as error:
+        raise UserAlreadyExists(error)
+    except Exception as error:
+        raise UserError(error)
 
 
 def check_login(username, password):
