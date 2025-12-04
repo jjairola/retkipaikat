@@ -12,7 +12,6 @@
     </div>
     <div>
         <p><strong>Kuvaus:</strong><br />{{ destination.description | show_lines}}</p>
-        <p><strong>Kunta:</strong> {{ destination.municipality }}</p>
         <p><strong>Lisännyt:</strong> <a href="{{ url_for('get_user', user_id=destination.user_id) }}">{{ destination.username }}</a></p>
 
         {% for title, value in classes.items() %}

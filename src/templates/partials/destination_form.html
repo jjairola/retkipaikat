@@ -9,11 +9,6 @@
             required>{{ destination.description }}</textarea>
     </div>
     <div>
-        <label for="municipality">Kunta</label>
-        <input id="municipality" type="text" name="municipality" value="{{ destination.municipality }}" required
-            minlength="5" maxlength="80" />
-    </div>
-    <div>
         {% for class in classes %}
         <p>
             <label for="class{{ class }}">{{ class }}</label>

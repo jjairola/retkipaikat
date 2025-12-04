@@ -97,11 +97,6 @@ def add_destination():
             flash("Kuvauksen pitää olla 10-500 merkkiä pitkä.", "error")
             return redirect(url_for("add_destination"))
 
-        municipality = request.form.get("municipality")
-        if not municipality:
-            flash("Paikkakunta ei voi olla tyhjä.", "error")
-            return redirect(url_for("add_destination"))
-
         classes = []
         for entry in request.form.getlist("classes"):
             if entry:
@@ -116,7 +111,6 @@ def add_destination():
             destination_id = destinations.add_destination(
                 name,
                 description,
-                municipality,
                 session["user_id"],
                 classes,
             )
@@ -156,7 +150,6 @@ def edit_destination(destination_id):
 
         name = request.form.get("name")
         description = request.form.get("description")
-        municipality = request.form.get("municipality")
 
         classes = []
         for entry in request.form.getlist("classes"):
@@ -173,7 +166,6 @@ def edit_destination(destination_id):
                 destination_id,
                 name,
                 description,
-                municipality,
                 classes,
             )
             flash("Retkipaikka päivitetty.")

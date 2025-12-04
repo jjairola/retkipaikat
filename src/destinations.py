@@ -5,11 +5,11 @@ class DestinationError(Exception):
     pass
 
 
-def add_destination(name, description, municipality, user_id, classes):
+def add_destination(name, description, user_id, classes):
     try:
-        sql = """INSERT INTO destinations (name, description, municipality, user_id)
-                VALUES (?, ?, ?, ?)"""
-        db.execute(sql, [name, description, municipality, user_id])
+        sql = """INSERT INTO destinations (name, description, user_id)
+                VALUES (?, ?, ?)"""
+        db.execute(sql, [name, description, user_id])
 
         destination_id = db.last_insert_id()
 
@@ -39,7 +39,7 @@ def get_destinations(
     page_size=None,
 ):
     sql = """
-    SELECT d.id, d.name, d.description, d.municipality,
+    SELECT d.id, d.name, d.description,
             d.user_id, u.username,
             GROUP_CONCAT(dc.title || ':' || dc.value, ';') classes,
             rc.average_rating
@@ -122,10 +122,10 @@ def get_destination_classes(destination_id):
     return dict(db.query(sql, [destination_id]))
 
 
-def update_destination(destination_id, name, description, municipality, classes):
+def update_destination(destination_id, name, description, classes):
     try:
-        sql = """UPDATE destinations SET name = ?, description = ?, municipality = ? WHERE id = ?"""
-        db.execute(sql, [name, description, municipality, destination_id])
+        sql = """UPDATE destinations SET name = ?, description = ? WHERE id = ?"""
+        db.execute(sql, [name, description, destination_id])
 
         sql = "DELETE FROM destination_classes WHERE destination_id = ?"
         db.execute(sql, [destination_id])
