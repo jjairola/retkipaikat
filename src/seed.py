@@ -13,13 +13,14 @@ comment_count = 10**6
 
 print("Users")
 for i in range(1, user_count + 1):
-    db.execute("INSERT INTO users (username) VALUES (?)",
-               ["user" + str(i)])
+    db.execute("INSERT INTO users (username, password_hash) VALUES (?, ?)",
+               ["user" + str(i), "hash"])
 
 print("Destinations")
 for i in range(1, destination_count + 1):
-    db.execute("INSERT INTO destinations (name) VALUES (?)",
-               ["destinations" + str(i)])
+    user_id = random.randint(1, user_count)
+    db.execute("INSERT INTO destinations (name, user_id) VALUES (?, ?)",
+               ["destinations" + str(i), user_id])
 
 print("Comments")
 for i in range(1, comment_count + 1):

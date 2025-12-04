@@ -39,10 +39,12 @@ def get_destinations(
     page_size=None,
 ):
     sql = """
-    SELECT d.id, d.name, d.description, d.municipality, d.user_id,
+    SELECT d.id, d.name, d.description, d.municipality,
+            d.user_id, u.username,
             GROUP_CONCAT(dc.title || ':' || dc.value, ';') classes,
             rc.average_rating
     FROM destinations d
+    JOIN users u ON d.user_id = u.id
     LEFT JOIN ratings_cache rc ON d.id = rc.destination_id
     LEFT JOIN destination_classes dc ON d.id = dc.destination_id
     LEFT JOIN comments c ON d.id = c.destination_id

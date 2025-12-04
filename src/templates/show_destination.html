@@ -13,7 +13,7 @@
     <div>
         <p><strong>Kuvaus:</strong><br />{{ destination.description | show_lines}}</p>
         <p><strong>Kunta:</strong> {{ destination.municipality }}</p>
-        <p><strong>Lisännyt:</strong> {{ destination.username }}</p>
+        <p><strong>Lisännyt:</strong> <a href="{{ url_for('get_user', user_id=destination.user_id) }}">{{ destination.username }}</a></p>
 
         {% for title, value in classes.items() %}
         <p><strong>{{ title }}:</strong> {{ value }}</p>
@@ -33,23 +33,7 @@
 
 {% if comments %}
 <h3>Kommentit</h3>
-{% for comment in comments %}
-<div class="comment">
-    <span>
-        <strong>{{ comment.created_at }} {{ comment.username }}:</strong> Arvosana: {{ comment.rating }}
-    </span>
-    <p>{{ comment.comment }}</p>
-
-    {% if session.user_id and session.user_id == comment.user_id %}
-    <div class="container">
-        <a class="button" href="/destination/{{destination.id}}/comments/{{ comment.id }}/edit"
-            class="button">Muokkaa</a>
-        <a class="button" href="/destination/{{destination.id}}/comments/{{ comment.id }}/delete"
-            class="button">Poista</a>
-    </div>
-    {% endif %}
-</div>
-{% endfor %}
+{% include "partials/comments_list.html" %}
 {% else %}
 <p>Ei kommentteja.</p>
 {% endif %}
