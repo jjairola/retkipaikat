@@ -42,12 +42,14 @@ def get_destinations(
     SELECT d.id, d.name, d.description,
             d.user_id, u.username,
             GROUP_CONCAT(dc.title || ':' || dc.value, ';') classes,
-            rc.average_rating
+            rc.average_rating,
+            di.image IS NOT NULL AS has_image
     FROM destinations d
     JOIN users u ON d.user_id = u.id
     LEFT JOIN ratings_cache rc ON d.id = rc.destination_id
     LEFT JOIN destination_classes dc ON d.id = dc.destination_id
     LEFT JOIN comments c ON d.id = c.destination_id
+    LEFT JOIN destination_images di ON d.id = di.destination_id
     """
 
     # where(s)
@@ -83,10 +85,14 @@ def get_destinations(
 
     rows = db.query(sql, params)
 
+    print(dict(rows[0]))
+
     results = []
     for row in rows:
         result = dict(row)
-        if "classes" in row:
+        print(">")
+        print(dict(row))
+        if "classes" in row.keys():
             classes = row["classes"].split(";")
             class_dict = {}
             for class_item in classes:
@@ -182,3 +188,14 @@ def get_all_classes_with_count():
         classes[title].append({ "value": value, "count": count })
 
     return classes
+
+def get_image(user_id):
+    sql = "SELECT image FROM destination_images WHERE user_id = ?"
+    result = db.query(sql, [user_id])
+    return result[0]["image"] if result else None
+
+def update_image(user_id, image):
+    # Replace changes primary key, but it doesn't matter here.
+    # Currently only one image per destination.
+    sql = "INSERT OR REPLACE INTO destination_images (destination_id, image) VALUES (?, ?)"
+    db.execute(sql, [user_id, image])

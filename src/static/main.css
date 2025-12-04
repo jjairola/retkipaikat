@@ -171,3 +171,11 @@ textarea {
   background-color: var(--primary-color);
   color: white;
 }
+
+.destination-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-right: 20px;
+}

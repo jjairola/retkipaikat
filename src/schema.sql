@@ -4,13 +4,6 @@ CREATE TABLE users (
     password_hash TEXT NOT NULL
 );
 
-CREATE TABLE user_images (
-    id INTEGER PRIMARY KEY,
-    user_id INTEGER UNIQUE NOT NULL REFERENCES users(id)
-        ON DELETE CASCADE,
-    image BLOB NOT NULL
-);
-
 CREATE INDEX idx_users_username ON users(username);
 
 CREATE TABLE destinations (
@@ -20,6 +13,12 @@ CREATE TABLE destinations (
     user_id INTEGER REFERENCES users
 );
 
+CREATE TABLE destination_images (
+    id INTEGER PRIMARY KEY,
+    destination_id INTEGER REFERENCES destinations
+        ON DELETE CASCADE,
+    image BLOB NOT NULL
+);
 
 CREATE TABLE ratings_cache (
     destination_id INTEGER PRIMARY KEY REFERENCES destinations
@@ -34,7 +33,8 @@ CREATE INDEX idx_ratings_cache_avgerage
 CREATE TABLE classes (
     id INTEGER PRIMARY KEY,
     title TEXT,
-    value TEXT
+    value TEXT,
+    default_icon TEXT
 );
 
 CREATE TABLE destination_classes (

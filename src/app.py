@@ -1,4 +1,3 @@
-from email.mime import image
 from flask import Flask, abort, make_response, url_for
 from flask import flash, redirect, render_template, request, session
 import utils
@@ -9,11 +8,13 @@ import destinations
 import comments
 import math
 import ratings_cache
+import classes
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
 app.add_template_filter(utils.show_lines, name="show_lines")
 
+cache = {}
 
 @app.route("/")
 @app.route("/<int:page>")
@@ -29,28 +30,34 @@ def index(page=1):
         return redirect("/" + str(page_count))
 
     destinations_list = destinations.get_destinations(page=page, page_size=page_size)
+    print(destinations_list)
+    default_icons = classes.get_default_icons()
     return render_template(
-        "index.html", destinations=destinations_list, page=page, page_count=page_count
+        "index.html",
+        destinations=destinations_list,
+        page=page,
+        page_count=page_count,
+        default_icons=default_icons,
     )
 
 
 @app.route("/search-destination")
 def search_destination():
-    classes = destinations.get_all_classes_with_count()
+    all_classes = destinations.get_all_classes_with_count()
 
     query_text = request.args.get("query", "")
     query_class = request.args.get("class", "")
 
     results = []
     if query_text:
-       results = destinations.search_destinations_by_query(query_text)
+        results = destinations.search_destinations_by_query(query_text)
     elif query_class:
-       title, value = query_class.split(":", 1)
-       results = destinations.search_destinations_by_class(title, value)
+        title, value = query_class.split(":", 1)
+        results = destinations.search_destinations_by_class(title, value)
 
     return render_template(
         "search_destination.html",
-        classes=classes,
+        classes=all_classes,
         query=query_text,
         results=results,
     )
@@ -384,6 +391,7 @@ def get_user(user_id):
         comments=comments_list,
     )
 
+
 @app.route("/user/<int:user_id>/add_image", methods=["POST"])
 def add_user_image(user_id):
     utils.require_login()
@@ -404,6 +412,7 @@ def add_user_image(user_id):
     flash("Kuva päivitetty")
     return redirect("/user/" + str(user_id))
 
+
 @app.route("/image/<int:user_id>")
 def get_user_image(user_id):
     image = users.get_image(user_id)
@@ -414,6 +423,24 @@ def get_user_image(user_id):
     response.headers.set("Content-Type", "image/jpeg")
     return response
 
+
+@app.template_filter('class_default_icon')
+def class_default_icon(destination_classes, title):
+    if "default_icons" not in cache:
+        cache["default_icons"] = classes.get_default_icons()
+        
+    icons = cache["default_icons"]
+
+    value = destination_classes.get(title)
+    if not value:
+        return ""
+    
+    if icons.get(title):
+        if icons[title].get(value):
+            return icons[title][value]
+    
+    return ""
+    
 
 
 @app.errorhandler(404)

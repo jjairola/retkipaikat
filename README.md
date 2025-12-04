@@ -52,3 +52,4 @@ python3 seed.py
 # Päivitä arvostelujen välimuisti joka tarvitaan etusivun lajittelun arvostelujen mukaan
 python3 ratings_cache.py
 ```
+

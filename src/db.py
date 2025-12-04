@@ -31,7 +31,6 @@ def execute_many(sql, param_list):
 def last_insert_id():
     return g.last_insert_id
 
-
 def query(sql, params=[]):
     print_query(sql, params)
     con = get_connection()

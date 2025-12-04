@@ -2,13 +2,12 @@
 INSERT OR IGNORE INTO users (username, password_hash) VALUES
 ('admin', 'hash');
 
-INSERT INTO classes (title, value) VALUES ('Tyyppi', 'Lintutorni');
-INSERT INTO classes (title, value) VALUES ('Tyyppi', 'Laavu');
-INSERT INTO classes (title, value) VALUES ('Tyyppi', 'Kota');
-INSERT INTO classes (title, value) VALUES ('Tyyppi', 'Tulentekopaikka');
-INSERT INTO classes (title, value) VALUES ('Tyyppi', 'Näköalapaikka');
-INSERT INTO classes (title, value) VALUES ('Tyyppi', 'Retkeilyreitti');
-INSERT INTO classes (title, value) VALUES ('Tyyppi', 'Luontopolku');
+INSERT INTO classes (title, value, default_icon) VALUES ('Tyyppi', 'Lintutorni', 'bird-tower.svg');
+INSERT INTO classes (title, value, default_icon) VALUES ('Tyyppi', 'Laavu', 'shelter.svg');
+INSERT INTO classes (title, value, default_icon) VALUES ('Tyyppi', 'Kota', 'hut.svg');
+INSERT INTO classes (title, value, default_icon) VALUES ('Tyyppi', 'Tulentekopaikka', 'fire-place.svg');
+INSERT INTO classes (title, value, default_icon) VALUES ('Tyyppi', 'Näköalapaikka', 'view-point.svg');
+INSERT INTO classes (title, value, default_icon) VALUES ('Tyyppi', 'Luontopolku', 'nature-trail.svg');
 
 INSERT INTO classes (title, value) VALUES ('Vaikeusaste', 'Helppo');
 INSERT INTO classes (title, value) VALUES ('Vaikeusaste', 'Keskitaso');
