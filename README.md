@@ -14,15 +14,19 @@ Tässä pääasiallinen tietokohde on retkipaikka ja toissijainen tietokohde on 
 
 ## Sovelluksen asennus
 
-### Kurssin esimerkkisuositustapaa noudattava:
+### Python env
 
-Asenna `flask`-kirjasto.
+Ohelman vaatimukset on tallennettu requirements.txt tiedostoon, joka toimii seuraavasti venv kanssa.
+
+Asennus:
 
 ```
-$ pip install flask
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
-Luo tietokanta ja alkutiedot:
+Tiedokannan alustus:
 
 ```
 sqlite3 database.db < schema.sql
@@ -36,19 +40,15 @@ $ cd src
 $ flask run
 ```
 
-Mene selaimella http://localhost:5000
 
-B. Koko kehitysympäristö pylint + black +penv
+###
 
-
-### Python env
-
-Ohjeet (Mac/Linux):
+Tietokannan alustus testausta varten:
 
 ```
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cd src
-flash run
+# Luo testidata
+python3 seed.py
+
+# Päivitä arvostelujen välimuisti joka tarvitaan etusivun lajittelun arvostelujen mukaan
+python3 ratings_cache.py
 ```
