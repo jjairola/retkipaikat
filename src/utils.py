@@ -14,7 +14,7 @@ def check_csrf():
 def parse_int(value):
     try:
         return int(value)
-    except (ValueError):
+    except (ValueError, TypeError):
         return None
 
 # template filter
