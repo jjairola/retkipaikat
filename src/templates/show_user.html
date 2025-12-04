@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
 
-{% block title %}Profiili{% endblock %}
+{% block title %}Käyttäjän profiili{% endblock %}
 
 {% block content %}
-<h2>Profiili</h2>
+<h2>Käyttäjä {{ user.username }}</h2>
 
-<h3>Omat retkipaikat</h3>
+<h3>Retkipaikat</h3>
 <p>
     Käyttäjällä on yhteensä {{ destinations | count }} retkipaikkaa.
 </p>
@@ -21,7 +21,7 @@
 <p>Sinulla ei ole vielä lisättyjä retkipaikkoja.</p>
 {% endif %}
 
-<h3>Omat kommentit</h3>
+<h3>Kommentit</h3>
 
 <p>
     Käyttäjällä on yhteensä {{ comments | count }} kommenttia.

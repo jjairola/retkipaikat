@@ -15,7 +15,7 @@
       <li><a class="button" href="{{ url_for('search_destination') }}">Etsi retkipaikka</a></li>
       {% if session.user_id %}
       <li><a class="button" href="{{ url_for('add_destination') }}">Uusi retkipaikka</a></li>
-      <li><a class="button" href="{{ url_for('profile') }}">Profiili</a></li>
+      <li><a class="button" href="{{ url_for('get_user', user_id=session.user_id) }}">Profiili</a></li>
       <li><a class="button" href="{{ url_for('logout') }}">Kirjaudu ulos</a></li>
       {% else %}
       <li><a class="button" href="{{ url_for('login') }}">Kirjaudu sisään</a></li>

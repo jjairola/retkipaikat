@@ -375,14 +375,16 @@ def delete_comment(destination_id, comment_id):
         return redirect(url_for("get_destination", destination_id=destination_id))
 
 
-@app.route("/profile")
-def profile():
-    utils.require_login()
-    user_destinations = destinations.get_destinations(user_id=session["user_id"])
-    comments_list = comments.get_comments_by_user(session["user_id"])
-    return render_template(
-        "profile.html", destinations=user_destinations, comments=comments_list
-    )
+@app.route("/user/<int:user_id>")
+def get_user(user_id):
+    user = users.get_user(user_id)
+    destinations_list = destinations.get_destinations(user_id)
+    comments_list = comments.get_comments_by_user(user_id)
+    
+    if not user:
+        abort(404)
+
+    return render_template("show_user.html", user=user, destinations=destinations_list, comments=comments_list)
 
 
 @app.errorhandler(404)
