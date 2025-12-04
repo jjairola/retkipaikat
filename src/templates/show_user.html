@@ -5,6 +5,19 @@
 {% block content %}
 <h2>Käyttäjä {{ user.username }}</h2>
 
+{% if user.has_image %}
+<img src="{{ url_for('get_user_image', user_id=user.id) }}" />
+{% endif %}
+
+{% if session["user_id"] == user.id %}
+<form action="{{ url_for('add_user_image', user_id=user.id) }}" method="post" enctype="multipart/form-data">
+    <p>
+        Kuva: <input type="file" name="image" accept=".jpg,.png" />
+    </p>
+    <input type="submit" value="Päivitä kuva" />
+</form>
+{% endif %}
+
 <h3>Retkipaikat</h3>
 <p>
     Käyttäjällä on yhteensä {{ destinations | count }} retkipaikkaa.
@@ -13,7 +26,8 @@
 <ul>
     {% for destination in destinations %}
     <li>
-        <a href="{{ url_for('get_destination', destination_id=destination.id) }}">{{ destination.name }}</a> (Arvostelu: {{ destination.average_rating }})
+        <a href="{{ url_for('get_destination', destination_id=destination.id) }}">{{ destination.name }}</a> (Arvostelu:
+        {{ destination.average_rating }})
     </li>
     {% endfor %}
 </ul>

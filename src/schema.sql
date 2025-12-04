@@ -4,6 +4,13 @@ CREATE TABLE users (
     password_hash TEXT NOT NULL
 );
 
+CREATE TABLE user_images (
+    id INTEGER PRIMARY KEY,
+    user_id INTEGER UNIQUE NOT NULL REFERENCES users(id)
+        ON DELETE CASCADE,
+    image BLOB NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_users_username
     ON users(username);
 

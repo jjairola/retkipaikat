@@ -1,4 +1,5 @@
-from flask import Flask, abort, url_for
+from email.mime import image
+from flask import Flask, abort, make_response, url_for
 from flask import flash, redirect, render_template, request, session
 import utils
 import secrets
@@ -277,7 +278,7 @@ def add_comment(destination_id):
     if not rating or int(rating) < 1 or int(rating) > 5:
         flash("Arvion pitää olla välillä 1-5.", "error")
         return redirect(url_for("get_destination", destination_id=destination_id))
-    
+
     try:
         comments.add_comment(
             destination_id,
@@ -316,7 +317,7 @@ def edit_comment(destination_id, comment_id):
         action = request.form.get("action")
         if action == "cancel":
             return redirect(url_for("get_destination", destination_id=destination_id))
-            
+
         comment = request.form.get("comment")
         rating = utils.parse_int(request.form.get("rating"))
 
@@ -372,11 +373,47 @@ def get_user(user_id):
     user = users.get_user(user_id)
     destinations_list = destinations.get_destinations(user_id)
     comments_list = comments.get_comments_by_user(user_id)
-    
+
     if not user:
         abort(404)
 
-    return render_template("show_user.html", user=user, destinations=destinations_list, comments=comments_list)
+    return render_template(
+        "show_user.html",
+        user=user,
+        destinations=destinations_list,
+        comments=comments_list,
+    )
+
+@app.route("/user/<int:user_id>/add_image", methods=["POST"])
+def add_user_image(user_id):
+    utils.require_login()
+
+    file = request.files["image"]
+    if not file.filename.endswith(".jpg") and not file.filename.endswith(".png"):
+        flash("Väärä tiedostomuoto", "error")
+        return redirect(url_for("get_user", user_id=user_id))
+
+    image = file.read()
+    if len(image) > 100 * 1024:
+        flash("Kuva liian suuri", "error")
+        return redirect(url_for("get_user", user_id=user_id))
+
+    user_id = session["user_id"]
+    users.update_image(user_id, image)
+
+    flash("Kuva päivitetty")
+    return redirect("/user/" + str(user_id))
+
+@app.route("/image/<int:user_id>")
+def get_user_image(user_id):
+    image = users.get_image(user_id)
+    if not image:
+        abort(404)
+
+    response = make_response(bytes(image))
+    response.headers.set("Content-Type", "image/jpeg")
+    return response
+
 
 
 @app.errorhandler(404)
