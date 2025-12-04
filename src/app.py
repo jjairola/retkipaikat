@@ -41,18 +41,18 @@ def search_destination():
     query_text = request.args.get("query", "")
     query_class = request.args.get("class", "")
 
-    results = []
-    if query_text:
-        results = destinations.search_destinations_by_query(query_text)
-    elif query_class:
-        title, value = query_class.split(":", 1)
-        results = destinations.search_destinations_by_class(title, value)
+    #results = []
+    #if query_text:
+    #    results = destinations.search_destinations_by_query(query_text)
+    #elif query_class:
+    #    title, value = query_class.split(":", 1)
+    #    results = destinations.search_destinations_by_class(title, value)
 
     return render_template(
         "search_destination.html",
         classes=classes,
         query=query_text,
-        results=results,
+        results=[],
     )
 
 
