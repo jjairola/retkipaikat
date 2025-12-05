@@ -2,7 +2,9 @@ import sqlite3
 from flask import g, current_app
 
 
-def print_query(sql, params=[]):
+def print_query(sql, params=None):
+    if params is None:
+        params = []
     if current_app.debug:
         print("SQL Query:", sql)
         print("Params:", params)
@@ -15,8 +17,10 @@ def get_connection():
     return con
 
 
-def execute(sql, params=[]):
+def execute(sql, params=None):
     print_query(sql, params)
+    if params is None:
+        params = []
     con = get_connection()
     result = con.execute(sql, params)
     con.commit()
@@ -36,7 +40,9 @@ def last_insert_id():
     return g.last_insert_id
 
 
-def query(sql, params=[]):
+def query(sql, params=None):
+    if params is None:
+        params = []
     print_query(sql, params)
     con = get_connection()
     result = con.execute(sql, params).fetchall()
