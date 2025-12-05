@@ -15,8 +15,8 @@ def update_comment(comment_id, comment, rating):
     try:
         sql = """UPDATE comments SET comment = ?, rating = ? WHERE id = ?"""
         db.execute(sql, [comment, rating, comment_id])
-    except Exception as e:
-        raise CommentError(e)
+    except Exception as error:
+        raise CommentError(error) from error
 
 
 def get_comments(destination_id):

@@ -27,9 +27,9 @@ def add_user(username, password):
         sql = "INSERT INTO users (username, password_hash) VALUES (?, ?)"
         db.execute(sql, [username, password_hash])
     except sqlite3.IntegrityError as error:
-        raise UserAlreadyExists(error)
+        raise UserAlreadyExists(error) from error
     except Exception as error:
-        raise UserError(error)
+        raise UserError(error) from error
 
 
 def check_login(username, password):

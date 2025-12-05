@@ -1,17 +1,16 @@
-from flask import Flask, abort, make_response, url_for
+import math
+from flask import Flask, abort, make_response, url_for, g
 from flask import flash, redirect, render_template, request, session
 import utils
-import secrets
 import config
 import users
 import destinations
 import comments
-import math
 import ratings_cache
 import classes
 
 app = Flask(__name__)
-app.secret_key = config.secret_key
+app.secret_key = config.SECRET_KEY
 app.add_template_filter(utils.show_lines, name="show_lines")
 
 cache = {}
@@ -66,7 +65,7 @@ def search_destination():
 @app.route("/destination/<int:destination_id>")
 def get_destination(destination_id):
     destination = destinations.get_destination(destination_id)
-    classes = destinations.get_destination_classes(destination_id)
+    destination_classes = destinations.get_destination_classes(destination_id)
     comments_list = comments.get_comments(destination_id)
 
     if not destination:
@@ -74,7 +73,7 @@ def get_destination(destination_id):
     return render_template(
         "show_destination.html",
         destination=destination,
-        classes=classes,
+        classes=destination_classes,
         comments=comments_list,
     )
 
@@ -105,7 +104,7 @@ def add_destination():
             flash("Kuvauksen pitää olla 10-500 merkkiä pitkä.", "error")
             return redirect(url_for("add_destination"))
 
-        classes = []
+        selected_classes = []
         for entry in request.form.getlist("classes"):
             if entry:
                 class_title, class_value = entry.split(":")
@@ -113,18 +112,18 @@ def add_destination():
                     abort(403)
                 if class_value not in all_classes[class_title]:
                     abort(403)
-                classes.append((class_title, class_value))
+                selected_classes.append((class_title, class_value))
 
         try:
             destination_id = destinations.add_destination(
                 name,
                 description,
                 session["user_id"],
-                classes,
+                selected_classes,
             )
             flash("Retkipaikka lisätty onnistuneesti.")
             return redirect(url_for("get_destination", destination_id=destination_id))
-        except Exception:
+        except destinations.DestinationError:
             flash("Virhe retkipaikan lisäämisessä.", "error")
             return redirect(url_for("add_destination"))
 
@@ -134,7 +133,7 @@ def edit_destination(destination_id):
     utils.require_login()
     destination = destinations.get_destination(destination_id)
 
-    if not destination or destination["user_id"] != session["user_id"]:
+    if not destination or destination.get("user_id") != session["user_id"]:
         abort(403)
 
     all_classes = destinations.get_all_classes()
@@ -159,7 +158,7 @@ def edit_destination(destination_id):
         name = request.form.get("name")
         description = request.form.get("description")
 
-        classes = []
+        selected_classes = []
         for entry in request.form.getlist("classes"):
             if entry:
                 class_title, class_value = entry.split(":")
@@ -167,18 +166,18 @@ def edit_destination(destination_id):
                     abort(403)
                 if class_value not in all_classes[class_title]:
                     abort(403)
-                classes.append((class_title, class_value))
+                selected_classes.append((class_title, class_value))
 
         try:
             destinations.update_destination(
                 destination_id,
                 name,
                 description,
-                classes,
+                selected_classes,
             )
             flash("Retkipaikka päivitetty.")
             return redirect(url_for("get_destination", destination_id=destination_id))
-        except Exception:
+        except destinations.DestinationError:
             flash("Virhe retkipaikan päivityksessä.", "error")
             return redirect(url_for("edit_destination", destination_id=destination_id))
 
@@ -187,7 +186,7 @@ def edit_destination(destination_id):
 def delete_destination(destination_id):
     utils.require_login()
     destination = destinations.get_destination(destination_id)
-    if not destination or destination["user_id"] != session["user_id"]:
+    if not destination or destination.get("user_id") != session["user_id"]:
         abort(403)
 
     if request.method == "GET":
@@ -204,7 +203,7 @@ def delete_destination(destination_id):
             destinations.delete_destination(destination_id)
             flash("Retkipaikka poistettu.")
             return redirect("/")
-        except Exception:
+        except destinations.DestinationError:
             flash("Virhe retkipaikan poistamisessa.", "error")
             return redirect(url_for("get_destination", destination_id=destination_id))
 
@@ -238,12 +237,13 @@ def register():
 
         except users.UserAlreadyExists:
             flash(
-                f"Käyttäjätunnus on jo käytössä. Haluatko <a href=\"{url_for('login')}\">kirjautua sisään?</a>",
+                "Käyttäjätunnus on jo käytössä. " +
+                f"Haluatko <a href=\"{url_for('login')}\">kirjautua sisään?</a>",
                 "error",
             )
             return redirect(url_for("register"))
 
-        except Exception:
+        except users.UserError:
             flash("Rekisteröitymisessä tapahtui virhe.", "error")
             return redirect(url_for("register"))
 
@@ -261,7 +261,7 @@ def login():
         if user_id:
             session["user_id"] = user_id
             session["username"] = username
-            session["csrf_token"] = secrets.token_hex(16)
+            session["csrf_token"] = utils.generate_csrf_token()
             flash("Kirjautuminen onnistui.")
             return redirect(url_for("index"))
         else:
@@ -302,7 +302,7 @@ def add_comment(destination_id):
         )
         ratings_cache.update_cache(destination_id)
         flash("Kommentti lisätty.")
-    except Exception as e:
+    except comments.CommentError:
         flash("Virhe kommentin lisäämisessä.", "error")
 
     return redirect(url_for("get_destination", destination_id=destination_id))
@@ -346,7 +346,7 @@ def edit_comment(destination_id, comment_id):
             comments.update_comment(comment_id, comment, rating)
             ratings_cache.update_cache(destination_id)
             flash("Kommentti päivitetty")
-        except Exception:
+        except comments.CommentError:
             flash("Virhe kommentin päivittämisessä", "error")
         return redirect(url_for("get_destination", destination_id=destination_id))
 
@@ -376,7 +376,7 @@ def delete_comment(destination_id, comment_id):
             comments.delete_comment(comment_id)
             ratings_cache.update_cache(destination_id)
             flash("Kommentti poistettu")
-        except Exception:
+        except destinations.DestinationError:
             flash("Virhe kommentin poistamisessa", "error")
         return redirect(url_for("get_destination", destination_id=destination_id))
 
@@ -449,13 +449,12 @@ def class_default_icon(destination_classes, title):
 
 
 @app.errorhandler(404)
-def page_not_found(e):
+def page_not_found(_error):
     return render_template("404.html"), 404
 
 
 if app.debug:
     import time
-    from flask import g
 
     @app.before_request
     def before_request():
