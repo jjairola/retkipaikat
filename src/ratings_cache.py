@@ -22,13 +22,13 @@ if __name__ == "__main__":
     from app import app
 
     with app.app_context():
-        sql = """
+        SQL = """
         SELECT d.id AS destination_id, ROUND(COALESCE(AVG(c.rating), 0), 1) AS average_rating
         FROM destinations d
         LEFT JOIN comments c ON c.destination_id = d.id
         GROUP BY d.id
         """
-        destinations = db.query(sql)
+        destinations = db.query(SQL)
 
         print("Updating ratings cache for", len(destinations), "destinations")
         data = [
@@ -36,10 +36,10 @@ if __name__ == "__main__":
             for destination_id, average_rating in destinations
         ]
 
-        sql_insert = """
+        SQL_INSERT = """
         INSERT OR REPLACE INTO ratings_cache (destination_id, average_rating)
         VALUES (?, ?)
         """
-        db.execute_many(sql_insert, data)
+        db.execute_many(SQL_INSERT, data)
 
         print("Ratings cache updated.")

@@ -70,6 +70,7 @@ def get_destination(destination_id):
 
     if not destination:
         abort(404)
+
     return render_template(
         "show_destination.html",
         destination=destination,
@@ -264,9 +265,9 @@ def login():
             session["csrf_token"] = utils.generate_csrf_token()
             flash("Kirjautuminen onnistui.")
             return redirect(url_for("index"))
-        else:
-            flash("Väärä tunnus tai salasana", "error")
-            return render_template("login.html", filled={"username": username})
+
+        flash("Väärä tunnus tai salasana", "error")
+        return render_template("login.html", filled={"username": username})
 
 
 @app.route("/logout")

@@ -18,8 +18,8 @@ def add_destination(name, description, user_id, classes):
             db.execute(sql, [destination_id, class_title, class_value])
 
         return destination_id
-    except Exception as e:
-        raise DestinationError(e)
+    except Exception as error:
+        raise DestinationError(error) from error
 
 
 def destination_count():
@@ -135,8 +135,8 @@ def update_destination(destination_id, name, description, classes):
         sql = "INSERT INTO destination_classes (destination_id, title, value) VALUES (?, ?, ?)"
         for class_title, class_value in classes:
             db.execute(sql, [destination_id, class_title, class_value])
-    except Exception as e:
-        raise DestinationError(e)
+    except Exception as error:
+        raise DestinationError(error) from error
 
 
 def delete_destination(destination_id):
@@ -149,8 +149,8 @@ def delete_destination(destination_id):
 
         sql = "DELETE FROM destinations WHERE id = ?"
         db.execute(sql, [destination_id])
-    except Exception as e:
-        raise DestinationError(e)
+    except Exception as error:
+        raise DestinationError(error) from error
 
 
 def get_all_classes():
@@ -194,7 +194,6 @@ def get_image(destination_id):
 
 
 def update_image(user_id, destination_id, image):
-    # Replace changes primary key, but it doesn't matter here.
-    # Currently only one image per destination.
-    sql = "INSERT OR REPLACE INTO destination_images (user_id, destination_id, image) VALUES (?, ?, ?)"
+    sql = """INSERT OR REPLACE INTO destination_images
+    (user_id, destination_id, image) VALUES (?, ?, ?)"""
     db.execute(sql, [user_id, destination_id, image])
