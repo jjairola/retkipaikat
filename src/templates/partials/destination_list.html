@@ -1,11 +1,6 @@
 <div class="flex">
     <div class="p-4">
-        {% if destination.has_image %}
-        <img class="destination-image" src="{{ url_for('get_destination_image', destination_id=destination.id) }}" />
-        {% else %}
-        <img src="/static/icons/{{ destination.classes | class_default_icon('Tyyppi') }}" alt="{{ destination.name }}"
-            class="destination-image">
-        {% endif %}
+        {% include 'partials/destination_image.html' %}
     </div>
     <div class="flex-1">
         <h3><a href="{{ url_for('get_destination', destination_id=destination.id) }}"

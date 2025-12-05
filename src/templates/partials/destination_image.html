@@ -1,0 +1,8 @@
+{% if destination.has_image %}
+<img class="destination-image" src="{{ url_for('get_destination_image', destination_id=destination.id) }}"
+    alt="Kuva {{destination.name}} retkipaikasta." />
+
+{% else %}
+<img class="destination-image" src="/static/icons/{{ destination.classes | class_default_icon('Tyyppi') }}"
+    alt="Oletuskuva {{ destination.name }} retkipaikasta.">
+{% endif %}

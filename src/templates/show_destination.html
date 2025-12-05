@@ -9,11 +9,7 @@
 
 <div class="flex">
     <div class="flex-1">
-        {% if destination.has_image %}
-        <img class="destination-image" src="{{ url_for('get_destination_image', destination_id=destination.id) }}" />
-        {% else %}
-        <img class="destination-image" src="/static/icons/{{ destination.classes | class_default_icon('Tyyppi') }}" />
-        {% endif %}
+        {% include 'partials/destination_image.html' %}
     </div>
     <div class="flex-1">
 
@@ -21,9 +17,8 @@
         {% if session["user_id"] == destination.user_id %}
         <form action="{{ url_for('add_destination_image', destination_id=destination.id) }}" method="post"
             enctype="multipart/form-data">
-            <p>
-                Kuva: <input type="file" name="image" accept=".jpg,.png" />
-            </p>
+            <label for="image">Päivitä kohteen kuva:</label>
+            <input id="image" type="file" name="image" accept=".jpg,.png" />
             <input type="submit" value="Päivitä kuva" />
         </form>
         {% endif %}
@@ -36,7 +31,7 @@
             {% if destination.description %}
             {{ destination.description | show_lines }}
             {% endif %}
-            
+
         </p>
         <p><strong>Lisännyt:</strong> <a href="{{ url_for('get_user', user_id=destination.user_id) }}">{{
                 destination.username }}</a></p>
