@@ -6,13 +6,34 @@
 
 <h2>{{ destination.name }}</h2>
 
-<div class="mb-4">
-    <div>
-        <img src="/static/placeholder.png" alt="{{ destination.name }}">
+
+<div class="flex">
+    <div class="flex-1">
+        {% if destination.has_image %}
+            <img class="destination-image" src="{{ url_for('get_destination_image', destination_id=destination.id) }}" />
+        {% else %}
+            <img class="destination-image" src="/static/icons/{{ destination.classes | class_default_icon('Tyyppi') }}" />
+        {% endif %}
     </div>
+    <div class="flex-1">
+
+
+        {% if session["user_id"] == destination.user_id %}
+        <form action="{{ url_for('add_destination_image', destination_id=destination.id) }}" method="post"
+            enctype="multipart/form-data">
+            <p>
+                Kuva: <input type="file" name="image" accept=".jpg,.png" />
+            </p>
+            <input type="submit" value="Päivitä kuva" />
+        </form>
+        {% endif %}
+    </div>
+</div>
+<div>
     <div>
         <p><strong>Kuvaus:</strong><br />{{ destination.description | show_lines}}</p>
-        <p><strong>Lisännyt:</strong> <a href="{{ url_for('get_user', user_id=destination.user_id) }}">{{ destination.username }}</a></p>
+        <p><strong>Lisännyt:</strong> <a href="{{ url_for('get_user', user_id=destination.user_id) }}">{{
+                destination.username }}</a></p>
 
         {% for title, value in classes.items() %}
         <p><strong>{{ title }}:</strong> {{ value }}</p>

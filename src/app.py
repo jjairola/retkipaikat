@@ -30,7 +30,6 @@ def index(page=1):
         return redirect("/" + str(page_count))
 
     destinations_list = destinations.get_destinations(page=page, page_size=page_size)
-    print(destinations_list)
     default_icons = classes.get_default_icons()
     return render_template(
         "index.html",
@@ -300,7 +299,6 @@ def add_comment(destination_id):
         ratings_cache.update_cache(destination_id)
         flash("Kommentti lisätty.")
     except Exception as e:
-        print(e)
         flash("Virhe kommentin lisäämisessä.", "error")
 
     return redirect(url_for("get_destination", destination_id=destination_id))
@@ -396,30 +394,30 @@ def get_user(user_id):
     )
 
 
-@app.route("/user/<int:user_id>/add_image", methods=["POST"])
-def add_user_image(user_id):
+@app.route("/destination/<int:destination_id>/add-image", methods=["POST"])
+def add_destination_image(destination_id):
     utils.require_login()
 
     file = request.files["image"]
     if not file.filename.endswith(".jpg") and not file.filename.endswith(".png"):
         flash("Väärä tiedostomuoto", "error")
-        return redirect(url_for("get_user", user_id=user_id))
+        return redirect(url_for("get_destination", destination_id=destination_id))
 
     image = file.read()
     if len(image) > 100 * 1024:
         flash("Kuva liian suuri", "error")
-        return redirect(url_for("get_user", user_id=user_id))
+        return redirect(url_for("get_destination", destination_id=destination_id))
 
     user_id = session["user_id"]
-    users.update_image(user_id, image)
+    destinations.update_image(user_id, destination_id, image)
 
     flash("Kuva päivitetty")
-    return redirect("/user/" + str(user_id))
+    return redirect(url_for("get_destination", destination_id=destination_id))
 
 
-@app.route("/image/<int:user_id>")
-def get_user_image(user_id):
-    image = users.get_image(user_id)
+@app.route("/image/<int:destination_id>")
+def get_destination_image(destination_id):
+    image = destinations.get_image(destination_id)
     if not image:
         abort(404)
 

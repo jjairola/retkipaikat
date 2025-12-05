@@ -85,14 +85,10 @@ def get_destinations(
 
     rows = db.query(sql, params)
 
-    print(dict(rows[0]))
-
     results = []
     for row in rows:
         result = dict(row)
-        print(">")
-        print(dict(row))
-        if "classes" in row.keys():
+        if "classes" in row.keys() and row["classes"] is not None:
             classes = row["classes"].split(";")
             class_dict = {}
             for class_item in classes:
@@ -189,13 +185,13 @@ def get_all_classes_with_count():
 
     return classes
 
-def get_image(user_id):
-    sql = "SELECT image FROM destination_images WHERE user_id = ?"
-    result = db.query(sql, [user_id])
+def get_image(destination_id):
+    sql = "SELECT image FROM destination_images WHERE destination_id = ?"
+    result = db.query(sql, [destination_id])
     return result[0]["image"] if result else None
 
-def update_image(user_id, image):
+def update_image(user_id, destination_id, image):
     # Replace changes primary key, but it doesn't matter here.
     # Currently only one image per destination.
-    sql = "INSERT OR REPLACE INTO destination_images (destination_id, image) VALUES (?, ?)"
-    db.execute(sql, [user_id, image])
+    sql = "INSERT OR REPLACE INTO destination_images (user_id, destination_id, image) VALUES (?, ?, ?)"
+    db.execute(sql, [user_id, destination_id, image])

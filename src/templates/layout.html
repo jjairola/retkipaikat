@@ -8,25 +8,29 @@
 </head>
 
 <body>
-  <nav class="max-800">
 
-    <ul class="nav-links">
-      <li><a class="button" href="{{ url_for('index') }}">Etusivu</a></li>
-      <li><a class="button" href="{{ url_for('search_destination') }}">Etsi retkipaikka</a></li>
-      {% if session.user_id %}
-      <li><a class="button" href="{{ url_for('add_destination') }}">Uusi retkipaikka</a></li>
-      <li><a class="button" href="{{ url_for('get_user', user_id=session.user_id) }}">Profiili</a></li>
-      <li><a class="button" href="{{ url_for('logout') }}">Kirjaudu ulos</a></li>
-      {% else %}
-      <li><a class="button" href="{{ url_for('login') }}">Kirjaudu sisään</a></li>
-      <li><a class="button" href="{{ url_for('register') }}">Luo tunnus</a></li>
-      {% endif %}
-    </ul>
+  <header class="max-800 container">
+    <logo>
+      <h1>Retkipaikat</h1>
+    </logo>
+    <nav>
+      <ul class="nav-links">
+        <li><a class="button" href="{{ url_for('index') }}">Etusivu</a></li>
+        <li><a class="button" href="{{ url_for('search_destination') }}">Etsi retkipaikka</a></li>
+        {% if session.user_id %}
+        <li><a class="button" href="{{ url_for('add_destination') }}">Uusi retkipaikka</a></li>
+        <li><a class="button" href="{{ url_for('get_user', user_id=session.user_id) }}">Profiili</a></li>
+        <li><a class="button" href="{{ url_for('logout') }}">Kirjaudu ulos</a></li>
+        {% else %}
+        <li><a class="button" href="{{ url_for('login') }}">Kirjaudu sisään</a></li>
+        <li><a class="button" href="{{ url_for('register') }}">Luo tunnus</a></li>
+        {% endif %}
+      </ul>
 
-  </nav>
+    </nav>
+  </header>
 
   <main class="max-800 content">
-    <h1>Retkipaikat</h1>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
@@ -39,9 +43,9 @@
     {% block content %}
     {% endblock %}
   </main>
-  <div class="max-800">
+  <footer class="max-800">
     Copyright &copy; 2025 Retkipaikat.
-  </div>
+  </footer>
 </body>
 
 </html>
