@@ -5,7 +5,7 @@
 {% block content %}
 <h2>Etsi retkipaikkaa hakusanalla</h2>
 
-<form action="/find-destination" method="get">
+<form action="/search-destination#results" method="get">
     <div>
         <label for="query">Hakusana</label>
         <input id="query" type="text" name="query" value="{{ query }}">
@@ -15,21 +15,22 @@
 
 <h2>Etsi retkipaikkaa luokituksella</h2>
 
-
 {% for title, values in classes.items() %}
-    <h3>{{ title }}</h3>
-    {% for value in values %}
-        <a href="{{ url_for('search_destination', class=title + ':' + value.value) }}">{{value.value}} ({{value.count}})</a>
+<h3>{{ title }}</h3>
+{% for value in values %}
+<a href="{{ url_for('search_destination', class=title + ':' + value.value) }}#results">{{value.value}} ({{value.count}})</a>
+{% endfor %}
+{% endfor %}
+
+
+<div id="results">
+    <h3>Tulokset</h3>
+    {% if results %}
+    {% for destination in results %}
+    {% include "partials/destination_list.html" %}
     {% endfor %}
-{% endfor %}
-
-
-<h3>Tulokset</h3>
-{% if results %}
-{% for destination in results %}
-{% include "partials/destination_list.html" %}
-{% endfor %}
-{% else %}
-<p>Ei tuloksia.</p>
-{% endif %}
-{% endblock %}
+    {% else %}
+    <p>Ei tuloksia.</p>
+    {% endif %}
+    {% endblock %}
+</div>

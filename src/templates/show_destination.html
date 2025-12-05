@@ -10,9 +10,9 @@
 <div class="flex">
     <div class="flex-1">
         {% if destination.has_image %}
-            <img class="destination-image" src="{{ url_for('get_destination_image', destination_id=destination.id) }}" />
+        <img class="destination-image" src="{{ url_for('get_destination_image', destination_id=destination.id) }}" />
         {% else %}
-            <img class="destination-image" src="/static/icons/{{ destination.classes | class_default_icon('Tyyppi') }}" />
+        <img class="destination-image" src="/static/icons/{{ destination.classes | class_default_icon('Tyyppi') }}" />
         {% endif %}
     </div>
     <div class="flex-1">
@@ -31,7 +31,13 @@
 </div>
 <div>
     <div>
-        <p><strong>Kuvaus:</strong><br />{{ destination.description | show_lines}}</p>
+        <p>
+            <strong>Kuvaus:</strong><br />
+            {% if destination.description %}
+            {{ destination.description | show_lines }}
+            {% endif %}
+            
+        </p>
         <p><strong>Lisännyt:</strong> <a href="{{ url_for('get_user', user_id=destination.user_id) }}">{{
                 destination.username }}</a></p>
 
