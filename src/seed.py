@@ -7,29 +7,29 @@ db.execute("DELETE FROM users")
 db.execute("DELETE FROM destinations")
 db.execute("DELETE FROM comments")
 
-user_count = 1000
-destination_count = 10**5
-comment_count = 10**6
+USER_COUNT = 50000
+DESTINATION_COUNT = 100000
+COMMENT_COUNT = 1000000
 
 classes = db.execute("SELECT title, value FROM classes").fetchall()
-types = [{"title": c[0], "value": c[1]} for c in classes if c[0] == "Tyyppi"]
-muncipalities = [
+type_classes = [{"title": c[0], "value": c[1]} for c in classes if c[0] == "Tyyppi"]
+muncipality_classes = [
     {"title": c[0], "value": c[1]} for c in classes if c[0] == "Paikkakunta"
 ]
-difficulties = [
+difficulty_classes = [
     {"title": c[0], "value": c[1]} for c in classes if c[0] == "Vaikeusaste"
 ]
 
 print("Users")
-for i in range(1, user_count + 1):
+for i in range(1, USER_COUNT + 1):
     db.execute(
         "INSERT INTO users (username, password_hash) VALUES (?, ?)",
         ["user" + str(i), "hash"],
     )
 
 print("Destinations")
-for i in range(1, destination_count + 1):
-    user_id = random.randint(1, user_count)
+for i in range(1, DESTINATION_COUNT + 1):
+    user_id = random.randint(1, USER_COUNT)
     result = db.execute(
         "INSERT INTO destinations (name, user_id) VALUES (?, ?)",
         ["destinations" + str(i), user_id],
@@ -37,21 +37,21 @@ for i in range(1, destination_count + 1):
 
     destination_id = result.lastrowid
 
-    muncipality = random.choice(muncipalities)
+    muncipality = random.choice(muncipality_classes)
     db.execute(
         """INSERT INTO destination_classes (destination_id, title, value)
                   VALUES (?, ?, ?)""",
         [destination_id, muncipality["title"], muncipality["value"]],
     )
 
-    type = random.choice(types)
+    type_class = random.choice(type_classes)
     db.execute(
         """INSERT INTO destination_classes (destination_id, title, value)
                   VALUES (?, ?, ?)""",
-        [destination_id, type["title"], type["value"]],
+        [destination_id, type_class["title"], type_class["value"]],
     )
 
-    difficulty = random.choice(difficulties)
+    difficulty = random.choice(difficulty_classes)
     db.execute(
         """INSERT INTO destination_classes (destination_id, title, value)
                   VALUES (?, ?, ?)""",
@@ -59,9 +59,9 @@ for i in range(1, destination_count + 1):
     )
 
 print("Comments")
-for i in range(1, comment_count + 1):
-    user_id = random.randint(1, user_count)
-    destination_id = random.randint(1, destination_count)
+for i in range(1, COMMENT_COUNT + 1):
+    user_id = random.randint(1, USER_COUNT)
+    destination_id = random.randint(1, DESTINATION_COUNT)
     rating = random.randint(1, 5)
     db.execute(
         """INSERT INTO comments (comment, user_id, destination_id, rating)

@@ -41,9 +41,27 @@ $ flask run
 ```
 
 
-###
 
-Tietokannan alustus testausta varten:
+
+
+## Suuren tietomäärän käsittely
+
+Sovelllus toimii suurella tietomäärällä. Raskain tietokantakysely suurella tietomäärällä on etusivun retkikohteiden lajittelu retkikohteiden saamien arvosanojen perusteella, koska lajittelua varten tarvitaan komenttien retkikohteelle muodostama arvosana.
+
+Etusivun arvosteluperusteinen järjestys on toteutettu erillisellä ```ratings_cache``` taululla, johon talletetaan jokaisen retkikohteen saama arvosana retkikohteen päivityksen yhteydessä. Ratings_cache:n päivityks valittiin toteutettavaksi koodissa tietokanta-triggerin sijaan, koska koska harjoitustyö haluttiin pitää hyvin yksinkertaisena.
+
+Seuraavat indeksit on luotu ja niiden käyttötarkoitus:
+
+1. ```CREATE INDEX idx_ratings_cache_avgerage ON ratings_cache(average_rating DESC);``` - Käytetään rekikohteiden järjestämiseen retkikohteiden saaman arvosanan mukaan. Etusivulla näytettyvät destionations (retkikohteet):lle tehdään right join ratings_cache taulun kanssa. Näin voidaan tehdä limitys suoraan valmiiden keskiarvojen mukaan, eikä keskiarvoja tarvitse laskea erikseen kommenteista. Ilman ratings_cache taulua, joudutaan laskemaan kaikkien kommenttien keskiarvo muodostamat arvosanat jokaiselle retkikohteelle, joka on erityisen raskas kysely.
+
+2.  ```CREATE INDEX idx_classes_title_value ON destination_classes(title, value);``` - Retkikohteiden hakusivulla lasketaan jokaiselle luokittelulle niiden määrä tietokannassa. Indeksi tarvitaan, että voidaan laskea jokaiselle luokittelulle (title, value) tehokkaasti osumien määrä tietokannassa.
+
+3. ```CREATE INDEX idx_destination_classes_destination_id ON destination_classes(destination_id);``` - Retkikohteiden kyselyyn liitetään aina retkikohteen luokittelut. Oletuksena destionation_classes(destination_id) ei ole indeksoitu, mikä ei ole tehokasta useampien rekitkohteiden näyttämisessä listaussivulla.
+
+4. ```CREATE INDEX idx_comments_destination ON comments(destination_id);``` - Retkikohteiden kyselyyn liitetään aina retkikohteen kommentit. Oletuksena comments(destination_id) ei ole indeksoitu, mikä ei ole tehokasta useampien rekitkohteiden näyttämisessä listaussivulla.
+
+
+### Tietokannan alustus testausta varten
 
 ```
 # Luo testidata
@@ -53,3 +71,7 @@ python3 seed.py
 python3 ratings_cache.py
 ```
 
+Testidata luo:
+* käyttäjiä:  50000
+* retkikohteita: 100000
+* kommentteja: 1000000
