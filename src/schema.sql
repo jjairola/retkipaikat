@@ -37,14 +37,16 @@ CREATE TABLE classes (
     id INTEGER PRIMARY KEY,
     title TEXT,
     value TEXT,
-    default_icon TEXT
+    default_icon TEXT,
+    UNIQUE(title, value)
 );
 
 CREATE TABLE destination_classes (
     id INTEGER PRIMARY KEY,
     destination_id INTEGER REFERENCES destinations,
     title TEXT,
-    value TEXT
+    value TEXT,
+    UNIQUE(destination_id, title, value)
 );
 
 CREATE INDEX idx_classes_title_value 
