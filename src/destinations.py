@@ -16,7 +16,7 @@ def add_destination(name, description, user_id, classes):
         sql = "INSERT INTO destination_classes (destination_id, title, value) VALUES (?, ?, ?)"
         for class_title, class_value in classes:
             db.execute(sql, [destination_id, class_title, class_value])
-        
+
         return destination_id
     except Exception as e:
         raise DestinationError(e)
@@ -165,6 +165,7 @@ def get_all_classes():
 
     return classes
 
+
 def get_all_classes_with_count():
     sql = """
     SELECT c.title, c.value, count(dc.value) as count
@@ -181,14 +182,16 @@ def get_all_classes_with_count():
     for title, value, count in result:
         classes[title] = []
     for title, value, count in result:
-        classes[title].append({ "value": value, "count": count })
+        classes[title].append({"value": value, "count": count})
 
     return classes
+
 
 def get_image(destination_id):
     sql = "SELECT image FROM destination_images WHERE destination_id = ?"
     result = db.query(sql, [destination_id])
     return result[0]["image"] if result else None
+
 
 def update_image(user_id, destination_id, image):
     # Replace changes primary key, but it doesn't matter here.

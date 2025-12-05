@@ -18,7 +18,9 @@
 {% endif %}
 
 <ul class="pagination">
-    <li><a href="{{ url_for('index', page=1) }}">&lt;&lt;</a></li>
+    {% with disabled = 'disabled' if page == 1 else '' %}
+    <li><a class="{{disabled}}" href="{{ url_for('index', page=1) }}">&lt;&lt;</a></li>
+    {% endwith %}
     {% for p in range(start, start + buttons) %}
         {% if p == page %}
             <li><a class="active" href="{{ url_for('index', page=p) }}">{{ p }}</a></li>
@@ -27,7 +29,9 @@
         {% endif %}
     
     {% endfor %}
-    <li><a href="{{ url_for('index', page=page_count) }}">&gt;&gt;</a></li>
+    {% with disabled = 'disabled' if page == page_count else '' %}
+    <li><a class="{{disabled}}" href="{{ url_for('index', page=page_count) }}">&gt;&gt;</a></li>
+    {% endwith %}
 </ul>
 
 {% endif %}

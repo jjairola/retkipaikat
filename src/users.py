@@ -6,6 +6,7 @@ import db
 class UserError(Exception):
     pass
 
+
 class UserAlreadyExists(Exception):
     pass
 
@@ -18,6 +19,7 @@ def get_user(user_id):
     """
     result = db.query(sql, [user_id])
     return result[0] if result else None
+
 
 def add_user(username, password):
     try:

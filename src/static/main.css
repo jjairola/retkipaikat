@@ -12,23 +12,81 @@ body {
     padding: 0;
 }
 
-.max-800 {
+header,
+footer,
+main {
     max-width: 800px;
     margin: 0 auto;
     margin-bottom: 20px;
 }
 
+header {
+    margin-top: 20px;
+}
+
 main {
     background-color: white;
-    padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+main .content {
+    padding: 20px;
+}
+
+header .site-name {
+    margin-bottom: 20px;
+}
+
+header .site-name a {
+    text-decoration: none;
+    color: var(--primary-color);
+    font-size: 24px;
+    font-weight: bold;
+}
+
+header .site-name a:visited {
+    color: var(--primary-color);
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: white;
+    padding: 0px 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+nav ul {
+    padding-inline-start: 0;
+}
+
 nav li {
     display: inline-block;
-    margin-right: 10px;
     list-style-type: none;
+    border: 1px solid var(--primary-color);
+    border-radius: 5px;
+}
+
+nav li a {
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+nav li a:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+nav li a.active {
+    background-color: var(--primary-color);
+    color: white;
 }
 
 button,
@@ -168,8 +226,14 @@ textarea {
 }
 
 .pagination li a.active {
-  background-color: var(--primary-color);
-  color: white;
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.pagination li a.disabled {
+    color: #dddddd;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 .destination-image {

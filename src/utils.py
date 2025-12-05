@@ -11,11 +11,13 @@ def check_csrf():
     if request.form["csrf_token"] != session["csrf_token"]:
         abort(403)
 
+
 def parse_int(value):
     try:
         return int(value)
     except (ValueError, TypeError):
         return None
+
 
 # template filter
 def show_lines(content):

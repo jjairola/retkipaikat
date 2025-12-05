@@ -16,6 +16,7 @@ app.add_template_filter(utils.show_lines, name="show_lines")
 
 cache = {}
 
+
 @app.route("/")
 @app.route("/<int:page>")
 def index(page=1):
@@ -236,9 +237,12 @@ def register():
             return redirect(url_for("login"))
 
         except users.UserAlreadyExists:
-            flash(f"Käyttäjätunnus on jo käytössä. Haluatko <a href=\"{url_for('login')}\">kirjautua sisään?</a>", "error")
+            flash(
+                f"Käyttäjätunnus on jo käytössä. Haluatko <a href=\"{url_for('login')}\">kirjautua sisään?</a>",
+                "error",
+            )
             return redirect(url_for("register"))
-        
+
         except Exception:
             flash("Rekisteröitymisessä tapahtui virhe.", "error")
             return redirect(url_for("register"))
@@ -426,23 +430,22 @@ def get_destination_image(destination_id):
     return response
 
 
-@app.template_filter('class_default_icon')
+@app.template_filter("class_default_icon")
 def class_default_icon(destination_classes, title):
     if "default_icons" not in cache:
         cache["default_icons"] = classes.get_default_icons()
-        
+
     icons = cache["default_icons"]
 
     value = destination_classes.get(title)
     if not value:
         return ""
-    
+
     if icons.get(title):
         if icons[title].get(value):
             return icons[title][value]
-    
+
     return ""
-    
 
 
 @app.errorhandler(404)

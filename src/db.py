@@ -1,10 +1,12 @@
 import sqlite3
 from flask import g, current_app
 
+
 def print_query(sql, params=[]):
     if current_app.debug:
         print("SQL Query:", sql)
         print("Params:", params)
+
 
 def get_connection():
     con = sqlite3.connect("database.db")
@@ -21,6 +23,7 @@ def execute(sql, params=[]):
     g.last_insert_id = result.lastrowid
     con.close()
 
+
 def execute_many(sql, param_list):
     print_query(sql, param_list)
     con = get_connection()
@@ -28,8 +31,10 @@ def execute_many(sql, param_list):
     con.commit()
     con.close()
 
+
 def last_insert_id():
     return g.last_insert_id
+
 
 def query(sql, params=[]):
     print_query(sql, params)

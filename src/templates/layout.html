@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 
-
 <head>
   <title>{% block title %}Retkipaikat{% endblock %}</title>
   <link rel="stylesheet" href="/static/main.css">
@@ -9,41 +8,50 @@
 
 <body>
 
-  <header class="max-800 container">
-    <logo>
-      <h1>Retkipaikat</h1>
-    </logo>
+  <header>
+    <div class="site-name">
+      <a href="{{ url_for('index') }}">Retkipaikat</a>
+    </div>
     <nav>
-      <ul class="nav-links">
-        <li><a class="button" href="{{ url_for('index') }}">Etusivu</a></li>
-        <li><a class="button" href="{{ url_for('search_destination') }}">Etsi retkipaikka</a></li>
+      <ul class="primary-nav">
+        <li><a class="{% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">Etusivu</a>
+        </li>
+        <li><a class="{% if request.endpoint == 'search_destination' %}active{% endif %}"
+            href="{{ url_for('search_destination') }}">Etsi retkipaikka</a></li>
+      </ul>
+      <ul class="user-nav">
         {% if session.user_id %}
-        <li><a class="button" href="{{ url_for('add_destination') }}">Uusi retkipaikka</a></li>
-        <li><a class="button" href="{{ url_for('get_user', user_id=session.user_id) }}">Profiili</a></li>
-        <li><a class="button" href="{{ url_for('logout') }}">Kirjaudu ulos</a></li>
+        <li><a class="{% if request.endpoint == 'add_destination' %}active{% endif %}"
+            href="{{ url_for('add_destination') }}">Uusi retkipaikka</a></li>
+        <li><a class="{% if request.endpoint == 'get_user' and request.view_args.get("user_id")==session["user_id"]
+            %}active{% endif %}" href="{{ url_for('get_user', user_id=session.user_id) }}">Profiili</a></li>
+        <li><a href="{{ url_for('logout') }}">Kirjaudu ulos</a></li>
         {% else %}
-        <li><a class="button" href="{{ url_for('login') }}">Kirjaudu sisään</a></li>
-        <li><a class="button" href="{{ url_for('register') }}">Luo tunnus</a></li>
+        <li><a class="{% if request.endpoint == 'login' %}active{% endif %}" href="{{ url_for('login') }}">Kirjaudu
+            sisään</a></li>
+        <li><a class="{% if request.endpoint =='register' %}active{% endif %}" href="{{ url_for('register') }}">Luo
+            tunnus</a></li>
         {% endif %}
       </ul>
 
     </nav>
   </header>
 
-  <main class="max-800 content">
+  <main>
+    <div class="content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      {% for category, message in messages %}
+      <div class="toast {{ category }}">{{ message | safe }}</div>
+      {% endfor %}
+      {% endif %}
+      {% endwith %}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    {% for category, message in messages %}
-    <div class="toast {{ category }}">{{ message | safe }}</div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
-
-    {% block content %}
-    {% endblock %}
+      {% block content %}
+      {% endblock %}
+    </div>
   </main>
-  <footer class="max-800">
+  <footer>
     Copyright &copy; 2025 Retkipaikat.
   </footer>
 </body>
