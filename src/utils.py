@@ -6,6 +6,7 @@ import markupsafe
 def generate_csrf_token():
     return secrets.token_hex(16)
 
+
 def require_login():
     if "user_id" not in session:
         abort(403)

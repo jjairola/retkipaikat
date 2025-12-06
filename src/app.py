@@ -42,7 +42,7 @@ def index(page=1):
 
 @app.route("/search-destination")
 def search_destination():
-    all_classes = destinations.get_all_classes_with_count()
+    all_classes = classes.get_all_classes_with_count()
 
     query_text = request.args.get("query", "")
     query_class = request.args.get("class", "")
@@ -82,7 +82,7 @@ def get_destination(destination_id):
 @app.route("/destination/add", methods=["GET", "POST"])
 def add_destination():
     utils.require_login()
-    all_classes = destinations.get_all_classes()
+    all_classes = classes.get_all_classes()
 
     if request.method == "GET":
         return render_template(
@@ -137,7 +137,7 @@ def edit_destination(destination_id):
     if not destination or destination.get("user_id") != session["user_id"]:
         abort(403)
 
-    all_classes = destinations.get_all_classes()
+    all_classes = classes.get_all_classes()
 
     if request.method == "GET":
         current_classes = destinations.get_destination_classes(destination_id)
@@ -238,8 +238,8 @@ def register():
 
         except users.UserAlreadyExists:
             flash(
-                "Käyttäjätunnus on jo käytössä. " +
-                f"Haluatko <a href=\"{url_for('login')}\">kirjautua sisään?</a>",
+                "Käyttäjätunnus on jo käytössä. "
+                + f"Haluatko <a href=\"{url_for('login')}\">kirjautua sisään?</a>",
                 "error",
             )
             return redirect(url_for("register"))
