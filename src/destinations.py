@@ -52,24 +52,30 @@ def get_destinations(
     LEFT JOIN destination_images di ON d.id = di.destination_id
     """
 
-    # where(s)
-
+    conditions = []
     params = []
     if user_id is not None:
-        sql += "WHERE d.user_id = ? "
-        params = [user_id]
+        conditions.append("d.user_id = ?")
+        params.append(user_id)
 
     if destination_id is not None:
-        sql += "WHERE d.id = ? "
-        params = [destination_id]
+        conditions.append("d.id = ?")
+        params.append(destination_id)
 
     if query_text is not None:
-        sql += "WHERE (d.name LIKE ? OR d.description LIKE ?) "
-        params = [f"%{query_text}%", f"%{query_text}%"]
+        conditions.append("(d.name LIKE ? OR d.description LIKE ?)")
+        params.extend([f"%{query_text}%", f"%{query_text}%"])
 
     if query_class is not None:
-        sql += "WHERE dc.title = ? AND dc.value = ? "
-        params = [query_class["title"], query_class["value"]]
+        destination_ids = get_destionation_ids_by_class(query_class["title"], query_class["value"])
+        if destination_ids is None:
+            return []
+        conditions.append("d.id IN ("+",".join(["?" for _ in destination_ids])+")")
+        params.extend(destination_ids)
+
+    if conditions:
+        sql += " WHERE " + " AND ".join(conditions)
+
 
     sql += """
     GROUP BY d.id
@@ -81,7 +87,7 @@ def get_destinations(
         offset = page_size * (page - 1)
 
         sql += "LIMIT ? OFFSET ?"
-        params = [limit, offset]
+        params.extend([limit, offset])
 
     rows = db.query(sql, params)
 
@@ -102,6 +108,15 @@ def get_destinations(
         results.append(result)
 
     return results
+
+def get_destionation_ids_by_class(title, value):
+    sql = """
+    SELECT destination_id FROM destination_classes
+    WHERE title = ? AND value = ?
+    """
+    rows = db.query(sql, [title, value])
+    dest_ids = [str(row["destination_id"]) for row in rows]
+    return dest_ids if len(dest_ids) else None
 
 
 def get_destination(destination_id):
