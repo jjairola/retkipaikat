@@ -6,6 +6,7 @@ db = sqlite3.connect("database.db")
 db.execute("DELETE FROM users")
 db.execute("DELETE FROM destinations")
 db.execute("DELETE FROM comments")
+db.execute("DELETE FROM destination_classes")
 
 USER_COUNT = 50000
 DESTINATION_COUNT = 100000

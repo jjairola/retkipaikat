@@ -31,10 +31,7 @@ if __name__ == "__main__":
         destinations = db.query(SQL)
 
         print("Updating ratings cache for", len(destinations), "destinations")
-        data = [
-            (destination_id, average_rating)
-            for destination_id, average_rating in destinations
-        ]
+        data = set(destinations)
 
         SQL_INSERT = """
         INSERT OR REPLACE INTO ratings_cache (destination_id, average_rating)
