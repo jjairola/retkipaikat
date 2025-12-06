@@ -147,6 +147,9 @@ def delete_destination(destination_id):
         sql = "DELETE FROM destination_classes WHERE destination_id = ?"
         db.execute(sql, [destination_id])
 
+        sql = "DELETE FROM destination_images WHERE destination_id = ?"
+        db.execute(sql, [destination_id])
+
         sql = "DELETE FROM destinations WHERE id = ?"
         db.execute(sql, [destination_id])
     except Exception as error:
