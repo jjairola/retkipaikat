@@ -1,4 +1,3 @@
-import math
 from flask import Flask, abort, make_response, url_for, g
 from flask import flash, redirect, render_template, request, session
 import utils
@@ -19,10 +18,8 @@ cache = {}
 @app.route("/")
 @app.route("/<int:page>")
 def index(page=1):
-    page_size = 10
     destination_count = destinations.destination_count()
-    page_count = math.ceil(destination_count / page_size)
-    page_count = max(page_count, 1)
+    page_count, page_size = utils.page_count(destination_count)
 
     if page < 1:
         return redirect("/1")

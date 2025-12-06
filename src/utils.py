@@ -1,7 +1,13 @@
+import math
 import secrets
 from flask import abort, session, request
 import markupsafe
+import config
 
+def page_count(items):
+    pages = math.ceil(items / config.PAGE_SIZE)
+    pages = max(pages, 1)
+    return pages, config.PAGE_SIZE
 
 def generate_csrf_token():
     return secrets.token_hex(16)
