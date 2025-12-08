@@ -46,7 +46,12 @@
     {% endfor %}
     <tr>
         <th>Arvostelu</th>
-        <td>{{ destination.average_rating }}></td>
+        <td>{% if destination.average_rating %}
+            {{ destination.average_rating }}
+            {% else %}
+            Ei arvosteluja
+            {% endif %}
+        </td>
     </tr>
 </table>
 

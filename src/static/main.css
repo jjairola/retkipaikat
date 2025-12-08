@@ -249,11 +249,19 @@ table.destination-details {
     margin-bottom: 20px;
 }
 
+table.destination-details th,
 table.destination-details td {
     padding: 8px 12px;
 }
 
+
 table.destination-details th {
+    vertical-align: top;
     text-align: left;
     font-weight: bold;
 }
+
+table.destination-details td {
+    vertical-align: top;
+}
+
