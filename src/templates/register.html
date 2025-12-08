@@ -8,7 +8,8 @@
 <form action="/register" method="post">
   <p>
     <label for="username">Tunnus</label>
-    <input type="text" name="username" id="username" value="{{ filled.username }}" minlength="5" maxlength="20" required />
+    <input type="text" name="username" id="username" value="{{ filled.username }}" minlength="5" maxlength="20" required
+      pattern="^[A-Za-z0-9]+$" title="Käyttäjätunnus tulee olla 5-20 merkkiä ja vain kirjaimia ja numeroita." />
   </p>
   <p>
     <label for="password1">Salasana</label>

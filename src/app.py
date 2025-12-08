@@ -216,6 +216,10 @@ def register():
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
 
+        if not (utils.is_username_valid_characters(username)):
+            flash("Käyttäjätunnus tulee olla 5-20 merkkiä ja vain kirjaimia ja numeroita.", "error")
+            return render_template("register.html", filled={"username": username})
+
         if len(username) < 5 or len(username) > 20:
             flash("Käyttäjätunnuksen oltava 5-20 merkkiä pitkä.", "error")
             return render_template("register.html", filled={"username": username})
