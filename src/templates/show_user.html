@@ -6,35 +6,41 @@
 <h2>Käyttäjä {{ user.username }}</h2>
 
 <h3>Retkipaikat</h3>
-<p>
-    Käyttäjällä on yhteensä {{ destinations | count }} retkipaikkaa.
-</p>
 {% if destinations %}
+<p>
+    Käyttäjällä on lisännyt {{ destinations | count }} retkipaikkaa, jotka ovat saaneet keskiarvostelun:
+</p>
 <ul>
     {% for destination in destinations %}
     <li>
-        <a href="{{ url_for('get_destination', destination_id=destination.id) }}">{{ destination.name }}</a> (Arvostelu:
-        {{ destination.average_rating }})
+        <a href="{{ url_for('get_destination', destination_id=destination.id) }}">{{ destination.name }}</a>
+        <i>, keskiarvostelu: {{ destination.average_rating }}</i>
     </li>
     {% endfor %}
 </ul>
 {% else %}
-<p>Sinulla ei ole vielä lisättyjä retkipaikkoja.</p>
+<p>Käyttäjä ei ole vielä lisännyt retkipaikkoja.</p>
 {% endif %}
 
 <h3>Kommentit</h3>
 
+{% if comments %}
 <p>
-    Käyttäjällä on yhteensä {{ comments | count }} kommenttia.
+    Käyttäjällä on lähettänyt {{ comments | count }} kommenttia ja arvosanaa, seuraaviin retkipaikkoihin:
 </p>
 
-{% if comments %}
+
 <ul>
     {% for comment in comments %}
     <li>
-        "{{ comment.comment }}" - <a href="{{ url_for('get_destination', destination_id=comment.destination_id) }}">{{
-            comment.destination_name }}</a>
-        {% if comment.rating %} (Arvostelu: {{ comment.rating }}) {% endif %}
+        <a href="{{ url_for('get_destination', destination_id=comment.destination_id) }}">
+            {{ comment.destination_name }}
+        </a>
+        <br />
+        <i>
+            {{ comment.created_at }}, arvosana {% if comment.rating %} {{ comment.rating }} {% endif %}
+        </i>
+
     </li>
     {% endfor %}
 </ul>

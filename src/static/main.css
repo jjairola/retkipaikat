@@ -265,3 +265,6 @@ table.destination-details td {
     vertical-align: top;
 }
 
+.content li {
+    margin-bottom: 5px;
+}

@@ -48,9 +48,10 @@ def delete_comment(comment_id):
 
 
 def get_comments_by_user(user_id):
-    sql = """SELECT c.comment, c.rating, d.name as destination_name, d.id as destination_id
-             FROM comments c
-             JOIN destinations d ON c.destination_id = d.id
-             WHERE c.user_id = ?
-             ORDER BY c.id DESC"""
+    sql = """SELECT c.comment, c.rating, c.created_at,
+            d.name as destination_name, d.id as destination_id
+            FROM comments c
+            JOIN destinations d ON c.destination_id = d.id
+            WHERE c.user_id = ?
+            ORDER BY c.created_at DESC"""
     return db.query(sql, [user_id])
