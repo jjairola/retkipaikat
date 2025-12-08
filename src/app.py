@@ -241,7 +241,7 @@ def register():
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
 
-        if not (utils.is_username_valid_characters(username)):
+        if not utils.is_username_valid_characters(username):
             flash(
                 "Käyttäjätunnus tulee olla 5-20 merkkiä ja vain kirjaimia ja numeroita.",
                 "error",
@@ -294,10 +294,10 @@ def login():
             session["csrf_token"] = utils.generate_csrf_token()
             flash("Kirjautuminen onnistui.")
             return redirect(url_for("index"))
-        else:
-            session["user_id"] = None
-            session["username"] = None
-            session["csrf_token"] = None
+
+        session["user_id"] = None
+        session["username"] = None
+        session["csrf_token"] = None
 
         flash("Väärä tunnus tai salasana", "error")
         return render_template("login.html", filled={"username": username})
