@@ -14,7 +14,7 @@ Tässä pääasiallinen tietokohde on retkipaikka ja toissijainen tietokohde on 
 
 ## Sovelluksen asennus
 
-### Python env
+### Python venv
 
 Ohelman vaatimukset on tallennettu requirements.txt tiedostoon, joka toimii seuraavasti venv kanssa.
 
@@ -46,30 +46,34 @@ $ flask run
 
 ## Suuren tietomäärän käsittely
 
-Sovelllus toimii suurella tietomäärällä. Raskain tietokantakysely suurella tietomäärällä on etusivun retkikohteiden lajittelu retkikohteiden saamien arvosanojen perusteella, koska lajittelua varten tarvitaan komenttien retkikohteelle muodostama arvosana.
+Sovellus on testattu suurella tietomäärällä. Sovellusta voi testata suurella tietomäärällä käyttämällä ```seed.py``` tiedostoa, joka luo suuren määrän testidataa.
 
-Etusivun arvosteluperusteinen järjestys on toteutettu erillisellä ```ratings_cache``` taululla, johon talletetaan jokaisen retkikohteen saama arvosana retkikohteen päivityksen yhteydessä. Ratings_cache:n päivityks valittiin toteutettavaksi koodissa tietokanta-triggerin sijaan, koska koska harjoitustyö haluttiin pitää hyvin yksinkertaisena.
+### Retkikohteiden sivuutus etusivulla
 
-Seuraavat indeksit on luotu ja niiden käyttötarkoitus:
+Retkikohteiden lajittelu etusivulla niiden saaman arvostelun perusteella osoittautui raskaaksi operaatioksi, jos kommenttien muodostama arvosana lasketaan jokaisella etusivun kyselyllä kaikista kommenteista. Tämän takia retkikohteen saama arvosana talletaan destinations -tauluun average_rating kenttään, ja kenttä päivitetään kommentin lisäyksen, muuttamisen ja poistamisen yhteydessä. Ohjelmassa päädyttiin toteuttamaan keskiarvon laskenta retkikohteelle koodissa tietokanta -triggerin sijaan, jotta ratkaisu on yksinkertainen. Keskiarvolle myös lisättiin indeksi.
 
-1. ```CREATE INDEX idx_ratings_cache_avgerage ON ratings_cache(average_rating DESC);``` - Käytetään rekikohteiden järjestämiseen retkikohteiden saaman arvosanan mukaan. Etusivulla näytettyvät destionations (retkikohteet):lle tehdään right join ratings_cache taulun kanssa. Näin voidaan tehdä limitys suoraan valmiiden keskiarvojen mukaan, eikä keskiarvoja tarvitse laskea erikseen kommenteista. Ilman ratings_cache taulua, joudutaan laskemaan kaikkien kommenttien keskiarvo muodostamat arvosanat jokaiselle retkikohteelle, joka on erityisen raskas kysely.
+Etusivulla käytetyt indeksit ja niiden käyttötarkoitukset:
 
-2.  ```CREATE INDEX idx_classes_title_value ON destination_classes(title, value);``` - Retkikohteiden hakusivulla lasketaan jokaiselle luokittelulle niiden määrä tietokannassa. Indeksi tarvitaan, että voidaan laskea jokaiselle luokittelulle (title, value) tehokkaasti osumien määrä tietokannassa.
+1. ```CREATE INDEX idx_destinations_average_rating ON destinations(average_rating DESC);``` - Käytetään rekikohteiden järjestämiseen retkikohteiden saaman arvosanan mukaan.
 
-3. ```CREATE INDEX idx_destination_classes_destination_id ON destination_classes(destination_id);``` - Retkikohteiden kyselyyn liitetään aina retkikohteen luokittelut. Oletuksena destionation_classes(destination_id) ei ole indeksoitu, mikä ei ole tehokasta useampien rekitkohteiden näyttämisessä listaussivulla.
+2. ```CREATE INDEX idx_destination_classes_destination_id ON destination_classes(destination_id);``` - Retkikohteiden kyselyyn liitetään aina retkikohteen luokittelut. Oletuksena destionation_classes(destination_id) ei ole indeksoitu, mikä ei ole tehokasta useampien rekitkohteiden näyttämisessä listaussivulla.
 
-4. ```CREATE INDEX idx_comments_destination ON comments(destination_id);``` - Retkikohteiden kyselyyn liitetään aina retkikohteen kommentit. Oletuksena comments(destination_id) ei ole indeksoitu, mikä ei ole tehokasta useampien rekitkohteiden näyttämisessä listaussivulla.
+3. ```CREATE INDEX idx_comments_destination ON comments(destination_id);``` - Retkikohteiden kyselyyn liitetään aina retkikohteen kommentit. Oletuksena comments(destination_id) ei ole indeksoitu, mikä ei ole tehokasta useampien rekitkohteiden näyttämisessä listaussivulla.
 
+### Hakusivu
+
+
+Hakusivulla lasketaan jokaiselle luokitukselle (classes) niiden nykyinen määrä (destination_classes taulussa). Tätä varten on lisätty indeksi, joka nopeuttaa luokituksien määrän laskentaa.
+
+Hakusivulla käytetyt indeksit ja käyttötarkoitukset:
+
+1.  ```CREATE INDEX idx_classes_title_value ON destination_classes(title, value);``` - Retkikohteiden hakusivulla lasketaan jokaiselle luokittelulle niiden määrä tietokannassa. Indeksi tarvitaan, että voidaan laskea jokaiselle luokittelulle (title, value) tehokkaasti osumien määrä tietokannassa.
 
 ### Tietokannan alustus testausta varten
 
 ```
 # Luo testidata
 python3 seed.py
-
-# Päivitä arvostelujen välimuisti joka tarvitaan etusivun lajittelun arvostelujen mukaan
-python3 ratings_cache.py
-```
 
 Testidata luo:
 * käyttäjiä:  50000
