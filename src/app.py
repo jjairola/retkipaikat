@@ -114,7 +114,10 @@ def add_destination():
 
         diff_classes = set(all_classes.keys()) - {c[0] for c in selected_classes}
         if diff_classes:
-            flash("Kaikki luokat tulee valita. Valitse: " + ", ".join(diff_classes), "error")
+            flash(
+                "Kaikki luokat tulee valita. Valitse: " + ", ".join(diff_classes),
+                "error",
+            )
             return redirect(url_for("add_destination"))
 
         try:
@@ -181,7 +184,10 @@ def edit_destination(destination_id):
         print(selected_classes)
         diff_classes = set(all_classes.keys()) - {c[0] for c in selected_classes}
         if diff_classes:
-            flash("Kaikki luokat tulee valita. Valitse: " + ", ".join(diff_classes), "error")
+            flash(
+                "Kaikki luokat tulee valita. Valitse: " + ", ".join(diff_classes),
+                "error",
+            )
             return redirect(url_for("edit_destination", destination_id=destination_id))
 
         try:
