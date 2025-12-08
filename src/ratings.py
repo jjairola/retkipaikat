@@ -11,7 +11,9 @@ def update_average_rating(destination_id):
             SELECT AVG(rating)
             FROM comments
             WHERE comments.destination_id = destinations.id
-        ), 0)"""
+        ), 0)
+        WHERE destinations.id = ?
+        """
         db.execute(sql, [destination_id])
     except Exception as error:
         raise RatingsError(error) from error

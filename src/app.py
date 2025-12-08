@@ -291,7 +291,7 @@ def add_comment(destination_id):
         flash("Kommentin pitää olla 1-500 merkkiä pitkä.", "error")
         return redirect(url_for("get_destination", destination_id=destination_id))
 
-    if not rating or int(rating) < 1 or int(rating) > 5:
+    if not rating or rating < 1 or rating > 5:
         flash("Arvion pitää olla välillä 1-5.", "error")
         return redirect(url_for("get_destination", destination_id=destination_id))
 
@@ -300,7 +300,7 @@ def add_comment(destination_id):
             destination_id,
             session["user_id"],
             comment,
-            int(rating),
+            rating,
         )
         ratings.update_average_rating(destination_id)
         flash("Kommentti lisätty.")
@@ -340,7 +340,7 @@ def edit_comment(destination_id, comment_id):
             flash("Kommentin pitää olla 1-500 merkkiä pitkä.", "error")
             return redirect(url_for("get_destination", destination_id=destination_id))
 
-        if not rating or int(rating) < 1 or int(rating) > 5:
+        if not rating or rating < 1 or rating > 5:
             flash("Arvion pitää olla välillä 1-5.", "error")
             return redirect(url_for("get_destination", destination_id=destination_id))
 

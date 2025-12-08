@@ -6,9 +6,12 @@ class CommentError(Exception):
 
 
 def add_comment(destination_id, user_id, comment, rating):
-    sql = """INSERT INTO comments (destination_id, user_id, comment, rating)
-             VALUES (?, ?, ?, ?)"""
-    db.execute(sql, [destination_id, user_id, comment, rating])
+    try:
+        sql = """INSERT INTO comments (destination_id, user_id, comment, rating)
+                VALUES (?, ?, ?, ?)"""
+        db.execute(sql, [destination_id, user_id, comment, rating])
+    except Exception as error:
+        raise CommentError(error) from error
 
 
 def update_comment(comment_id, comment, rating):
@@ -37,8 +40,11 @@ def get_comment(comment_id):
 
 
 def delete_comment(comment_id):
-    sql = "DELETE FROM comments WHERE id = ?"
-    db.execute(sql, [comment_id])
+    try:
+        sql = "DELETE FROM comments WHERE id = ?"
+        db.execute(sql, [comment_id])
+    except Exception as error:
+        raise CommentError(error) from error
 
 
 def get_comments_by_user(user_id):

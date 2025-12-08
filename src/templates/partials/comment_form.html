@@ -1,9 +1,13 @@
 <form class="mb-4" action="{{ action_url }}" method="post">
     <label for="comment">Kommentti</label>
-    <textarea name="comment" id="comment" required maxlength="500" required>{{ comment.comment if comment else '' }}</textarea>
+    <textarea name="comment" id="comment" required maxlength="500" required
+        title="Kommentin pitää olla 1-500 merkkiä pitkä.">{{ comment.comment if comment else '' }}</textarea>
     <br>
     <label for="rating">Arvosana (1-5)</label>
-    <input type="number" name="rating" id="rating" min="1" max="5" maxlength="1" value="{{ comment.rating if comment else '' }}" /><br>
+    <input type="number" name="rating" id="rating" min="1" max="5" maxlength="1"
+        value="{{ comment.rating if comment else '' }}" title="Arvion pitää olla välillä 1-5." /><br>
+
+
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
 
     {% if edit %}
