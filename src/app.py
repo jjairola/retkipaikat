@@ -112,7 +112,10 @@ def add_destination():
                     abort(403)
                 selected_classes.append((class_title, class_value))
 
-        # TODO: Check clases present
+        diff_classes = set(all_classes.keys()) - {c[0] for c in selected_classes}
+        if diff_classes:
+            flash("Kaikki luokat tulee valita. Valitse: " + ", ".join(diff_classes), "error")
+            return redirect(url_for("add_destination"))
 
         try:
             destination_id = destinations.add_destination(
@@ -175,7 +178,11 @@ def edit_destination(destination_id):
                     abort(403)
                 selected_classes.append((class_title, class_value))
 
-        # todo check classes
+        print(selected_classes)
+        diff_classes = set(all_classes.keys()) - {c[0] for c in selected_classes}
+        if diff_classes:
+            flash("Kaikki luokat tulee valita. Valitse: " + ", ".join(diff_classes), "error")
+            return redirect(url_for("edit_destination", destination_id=destination_id))
 
         try:
             destinations.update_destination(
