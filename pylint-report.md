@@ -117,8 +117,8 @@ Nämä ovat ilmoituksia, että sovelluksen koodissa ei ole käytetty docstring k
 
 ## Puuttuva palautusarvo (R1710)
 
-Toiseksi suurin osa pylint virheistä tulee app.py:n tavasta käsitellä GET ja POST pyynnöt samassa funktiossa. Koodin luettevuuden ja selkeyden takia molemmat request.method tarkistetaan molemmille pyynnöille if -lauseella, sen takia
-funktio ei saa paluuarvoa else -tapaukessa. Toiseksi funktiolla on annotaatio joka määrittää, että funktio on joko GET tai POST.
+Toiseksi suurin osa pylint virheistä tulee app.py:n tavasta käsitellä GET ja POST pyynnöt samassa funktiossa. Koodin luettevuuden ja selkeyden takia ```request.method``` tarkistetaan molemmille pyynnöille if -lauseella, sen takia
+funktio ei saa paluuarvoa else -tapaukessa. Funktiolla on myös annotaatio joka määrittää, että funktio on joko GET tai POST, joten funktion paluuarvon puute ei ole ongelma tässä tapauksessa.
 
 ```
 src/app.py:80:0: R1710: Either all return statements in a function should return an expression, or none of them should. (inconsistent-return-statements)
@@ -150,17 +150,18 @@ Retkipaikan (destinations) tietokantakyselyt on haluttu keskittää mahdollisimm
 
 ## Liian monta palautuslausetta (R0911)
 
-App.py tiedostossa tulee varoituksia, että funktoilla on useita palautuslauseita. Tämä johtuu form -validoinneista, jotka on tehty if-lauseilla. Formien validointi palauttaa funktion vastauksen ensimmäiseestä form virheestä. 
+App.py tiedostossa tulee varoituksia, että funktoilla on useita palautuslauseita. Tämä johtuu form -validoinneista, jotka on tehty if-lauseilla. Formien validointi palauttaa funktion vastauksen ensimmäiseestä form virheestä. Tämä tekee validoinneista yksinkertaisen ja koodi on helposti luettavaa.
 
 ```
 src/app.py:138:0: R0911: Too many return statements (7/6) (too-many-return-statements)
 ```
 
+Jos ohjelman koko kasvaisi, kannattaisi miettiä erillistä validaattoriluokkaa.
 
 ## Liikaa paikallisia muuttujia (R0914)
 
-````
-
-src/destinations.py:33:0: R0914: Too many local variables (21/15) (too-many-locals)
-
 ```
+src/destinations.py:33:0: R0914: Too many local variables (21/15) (too-many-locals)
+```
+
+`get_destinations` funktiossa on useita paikallisia muuttujia, koska se rakentaa argumenttien kukaan SQL-kyselyä. Tämä tekee kyselystä monipuolisen ja samalla vähentää tarvitta ylläpitää retkikohteiden hakuun liittyviä tietokantakyselyitä useammassa paikassa.
