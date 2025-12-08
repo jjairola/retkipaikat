@@ -24,23 +24,31 @@
         {% endif %}
     </div>
 </div>
-<div>
-    <div>
-        <p>
-            <strong>Kuvaus:</strong><br />
+
+<table class="destination-details">
+    <tr>
+        <th>Kuvaus</th>
+        <td>
             {% if destination.description %}
             {{ destination.description | show_lines }}
             {% endif %}
-
-        </p>
-        <p><strong>Lisännyt:</strong> <a href="{{ url_for('get_user', user_id=destination.user_id) }}">{{
-                destination.username }}</a></p>
-
-        {% for title, value in classes.items() %}
-        <p><strong>{{ title }}:</strong> {{ value }}</p>
-        {% endfor %}
-    </div>
-</div>
+        </td>
+    </tr>
+    <tr>
+        <th>Lisännyt</th>
+        <td><a href="{{ url_for('get_user', user_id=destination.user_id) }}">{{ destination.username }}</a></td>
+    </tr>
+    {% for title, value in classes.items() %}
+    <tr>
+        <th>{{ title }}</th>
+        <td>{{ value }}</td>
+    </tr>
+    {% endfor %}
+    <tr>
+        <th>Arvostelu</th>
+        <td>{{ destination.average_rating }}></td>
+    </tr>
+</table>
 
 {% if session.user_id and session.user_id == destination.user_id %}
 
