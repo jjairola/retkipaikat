@@ -15,6 +15,9 @@ CREATE TABLE destinations (
     average_rating REAL DEFAULT 0
 );
 
+CREATE INDEX idx_destinations_average_rating
+    ON destinations(average_rating DESC);
+
 CREATE TABLE destination_images (
     id INTEGER PRIMARY KEY,
     user_id INTEGER REFERENCES users
@@ -23,16 +26,6 @@ CREATE TABLE destination_images (
         ON DELETE CASCADE,
     image BLOB NOT NULL
 );
-
--- CREATE TABLE ratings_cache (
---     destination_id INTEGER PRIMARY KEY REFERENCES destinations
---         ON DELETE CASCADE,
---     average_rating REAL
--- );
-
---CREATE INDEX idx_ratings_cache_avgerage
---    ON ratings_cache(average_rating DESC);
-
 
 CREATE TABLE classes (
     id INTEGER PRIMARY KEY,
