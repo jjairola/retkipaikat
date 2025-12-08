@@ -21,16 +21,17 @@ Ohelman vaatimukset on tallennettu requirements.txt tiedostoon, joka toimii seur
 Asennus:
 
 ```
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+$ python3 -m venv .venv
+$ source .venv/bin/activate
+$ pip install -r requirements.txt
 ```
 
 Tiedokannan alustus:
 
 ```
-sqlite3 database.db < schema.sql
-sqlite3 database.db < init.sql
+$ cd src
+$ sqlite3 database.db < schema.sql
+$ sqlite3 database.db < init.sql
 ```
 
 Käynnistä ohjelma:
@@ -73,7 +74,8 @@ Hakusivulla käytetyt indeksit ja käyttötarkoitukset:
 
 ```
 # Luo testidata
-python3 seed.py
+$ python3 seed.py
+```
 
 Testidata luo:
 * käyttäjiä:  50000
