@@ -7,11 +7,14 @@ def update_average_rating(destination_id):
     try:
         sql = """
         UPDATE destinations
-        SET average_rating = COALESCE((
-            SELECT AVG(rating)
-            FROM comments
-            WHERE comments.destination_id = destinations.id
-        ), 0)
+        SET average_rating =
+            ROUND(
+                    COALESCE((
+                    SELECT AVG(rating)
+                    FROM comments
+                    WHERE comments.destination_id = destinations.id
+                ), 0),
+            1)
         WHERE destinations.id = ?
         """
         db.execute(sql, [destination_id])
