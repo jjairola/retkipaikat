@@ -23,14 +23,15 @@
         {% if session.user_id %}
         <li><a class="{% if request.endpoint == 'add_destination' %}active{% endif %}"
             href="{{ url_for('add_destination') }}">Uusi retkipaikka</a></li>
-        <li><a class="{% if request.endpoint == 'get_user' and request.view_args.get("user_id")==session["user_id"]
+        <li><a class="{% if request.endpoint == 'get_user' and request.view_args.get(" user_id")==session["user_id"]
             %}active{% endif %}" href="{{ url_for('get_user', user_id=session.user_id) }}">Profiili</a></li>
         <li><a href="{{ url_for('logout') }}">Kirjaudu ulos</a></li>
         {% else %}
-        <li><a class="{% if request.endpoint == 'login' %}active{% endif %}" href="{{ url_for('login') }}">Kirjaudu
-            sisään</a></li>
         <li><a class="{% if request.endpoint =='register' %}active{% endif %}" href="{{ url_for('register') }}">Luo
             tunnus</a></li>
+        <li><a class="{% if request.endpoint == 'login' %}active{% endif %}" href="{{ url_for('login') }}">Kirjaudu
+            sisään</a></li>
+
         {% endif %}
       </ul>
 
