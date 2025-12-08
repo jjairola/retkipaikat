@@ -44,7 +44,7 @@ def search_destination():
     query_text = request.args.get("query", "")
     query_class = request.args.get("class", "")
 
-    results = []
+    results = None
     if query_text:
         results = destinations.search_destinations_by_query(query_text)
     elif query_class:

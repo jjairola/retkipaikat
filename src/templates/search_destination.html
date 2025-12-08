@@ -22,7 +22,7 @@
 {% endfor %}
 {% endfor %}
 
-
+{% if results is not none %}
 <div id="results">
     <h3>Tulokset</h3>
     {% if results %}
@@ -32,5 +32,8 @@
     {% else %}
     <p>Ei tuloksia.</p>
     {% endif %}
-    {% endblock %}
+    
 </div>
+{% endif %}
+
+{% endblock %}
