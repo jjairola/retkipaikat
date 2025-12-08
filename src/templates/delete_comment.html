@@ -7,6 +7,8 @@
 
 <p>Oletko varma, että haluat poistaa tämän kommentin?</p>
 
-{% include "partials/delete_form.html" %}
+{% with action='delete' %}
+{% include "partials/comment_form.html" %}
+{% endwith %}
 
 {% endblock %}

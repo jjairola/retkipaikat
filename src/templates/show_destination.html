@@ -76,7 +76,7 @@
 {% if session.user_id %}
 <h3>Uusi kommentti</h3>
 
-{% with action_url="/destination/" ~ destination.id ~ "/comments", submit_text="Lähetä" %}
+{% with action_url="/destination/" ~ destination.id ~ "/comments", action='add' %}
 {% include "partials/comment_form.html" %}
 {% endwith %}
 
