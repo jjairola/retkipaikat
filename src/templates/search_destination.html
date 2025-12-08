@@ -18,7 +18,8 @@
 {% for title, values in classes.items() %}
 <h3>{{ title }}</h3>
 {% for value in values %}
-<a href="{{ url_for('search_destination', class=title + ':' + value.value) }}#results">{{value.value}} ({{value.count}})</a>
+<a href="{{ url_for('search_destination', class=title + ':' + value.value) }}#results">{{value.value}}
+    ({{value.count}})</a>
 {% endfor %}
 {% endfor %}
 
@@ -32,7 +33,7 @@
     {% else %}
     <p>Ei tuloksia.</p>
     {% endif %}
-    
+
 </div>
 {% endif %}
 
