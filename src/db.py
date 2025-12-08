@@ -27,6 +27,7 @@ def execute(sql, params=None):
     g.last_insert_id = result.lastrowid
     con.close()
 
+
 def last_insert_id():
     return g.last_insert_id
 

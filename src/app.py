@@ -112,7 +112,7 @@ def add_destination():
                     abort(403)
                 selected_classes.append((class_title, class_value))
 
-        # TODO: Check clases present    
+        # TODO: Check clases present
 
         try:
             destination_id = destinations.add_destination(
@@ -229,7 +229,10 @@ def register():
         password2 = request.form.get("password2")
 
         if not (utils.is_username_valid_characters(username)):
-            flash("Käyttäjätunnus tulee olla 5-20 merkkiä ja vain kirjaimia ja numeroita.", "error")
+            flash(
+                "Käyttäjätunnus tulee olla 5-20 merkkiä ja vain kirjaimia ja numeroita.",
+                "error",
+            )
             return render_template("register.html", filled={"username": username})
 
         if len(username) < 5 or len(username) > 20:
@@ -282,7 +285,6 @@ def login():
             session["user_id"] = None
             session["username"] = None
             session["csrf_token"] = None
-            
 
         flash("Väärä tunnus tai salasana", "error")
         return render_template("login.html", filled={"username": username})
@@ -421,13 +423,20 @@ def get_user(user_id):
 def add_destination_image(destination_id):
     utils.require_login()
 
+    destionation = destinations.get_destination(destination_id)
+    if not destionation:
+        abort(404)
+
+    if destionation.get("user_id") != session["user_id"]:
+        abort(403)
+
     file = request.files["image"]
-    if not file.filename.endswith(".jpg") and not file.filename.endswith(".png"):
+    if not utils.is_allowed_filetype(file.filename):
         flash("Väärä tiedostomuoto", "error")
         return redirect(url_for("get_destination", destination_id=destination_id))
 
     image = file.read()
-    if len(image) > 100 * 1024:
+    if len(image) > config.IMAGE_MAX_SIZE:
         flash("Kuva liian suuri", "error")
         return redirect(url_for("get_destination", destination_id=destination_id))
 

@@ -5,13 +5,23 @@ from flask import abort, session, request
 import markupsafe
 import config
 
+
+def is_allowed_filetype(filename):
+    for extension in config.IMAGE_EXTENSIONS:
+        if filename.lower().endswith(extension):
+            return True
+    return False
+
+
 def is_username_valid_characters(username):
-    return bool(re.match(r'^[A-Za-z0-9]+$', username))
+    return bool(re.match(r"^[A-Za-z0-9]+$", username))
+
 
 def page_count(items):
     pages = math.ceil(items / config.PAGE_SIZE)
     pages = max(pages, 1)
     return pages, config.PAGE_SIZE
+
 
 def generate_csrf_token():
     return secrets.token_hex(16)

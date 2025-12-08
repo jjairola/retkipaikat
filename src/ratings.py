@@ -1,7 +1,9 @@
 import db
 
+
 class RatingsError(Exception):
     pass
+
 
 def update_average_rating(destination_id):
     try:

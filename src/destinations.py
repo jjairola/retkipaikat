@@ -66,15 +66,16 @@ def get_destinations(
         params.extend([f"%{query_text}%", f"%{query_text}%"])
 
     if query_class is not None:
-        destination_ids = get_destionation_ids_by_class(query_class["title"], query_class["value"])
+        destination_ids = get_destionation_ids_by_class(
+            query_class["title"], query_class["value"]
+        )
         if destination_ids is None:
             return []
-        conditions.append("d.id IN ("+",".join(["?" for _ in destination_ids])+")")
+        conditions.append("d.id IN (" + ",".join(["?" for _ in destination_ids]) + ")")
         params.extend(destination_ids)
 
     if conditions:
         sql += " WHERE " + " AND ".join(conditions)
-
 
     sql += """
     GROUP BY d.id
@@ -107,6 +108,7 @@ def get_destinations(
         results.append(result)
 
     return results
+
 
 def get_destionation_ids_by_class(title, value):
     sql = """
