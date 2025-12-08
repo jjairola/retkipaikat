@@ -112,6 +112,8 @@ def add_destination():
                     abort(403)
                 selected_classes.append((class_title, class_value))
 
+        # TODO: Check clases present    
+
         try:
             destination_id = destinations.add_destination(
                 name,
@@ -173,6 +175,8 @@ def edit_destination(destination_id):
                     abort(403)
                 selected_classes.append((class_title, class_value))
 
+        # todo check classes
+
         try:
             destinations.update_destination(
                 destination_id,
@@ -191,6 +195,7 @@ def edit_destination(destination_id):
 def delete_destination(destination_id):
     utils.require_login()
     destination = destinations.get_destination(destination_id)
+
     if not destination or destination.get("user_id") != session["user_id"]:
         abort(403)
 
@@ -273,6 +278,11 @@ def login():
             session["csrf_token"] = utils.generate_csrf_token()
             flash("Kirjautuminen onnistui.")
             return redirect(url_for("index"))
+        else:
+            session["user_id"] = None
+            session["username"] = None
+            session["csrf_token"] = None
+            
 
         flash("Väärä tunnus tai salasana", "error")
         return render_template("login.html", filled={"username": username})
