@@ -5,7 +5,7 @@ import config
 import users
 import destinations
 import comments
-import ratings_cache
+import ratings
 import classes
 
 app = Flask(__name__)
@@ -298,7 +298,7 @@ def add_comment(destination_id):
             comment,
             int(rating),
         )
-        ratings_cache.update_cache(destination_id)
+        ratings.update_average_rating(destination_id)
         flash("Kommentti lisätty.")
     except comments.CommentError:
         flash("Virhe kommentin lisäämisessä.", "error")
@@ -342,7 +342,7 @@ def edit_comment(destination_id, comment_id):
 
         try:
             comments.update_comment(comment_id, comment, rating)
-            ratings_cache.update_cache(destination_id)
+            ratings.update_average_rating(destination_id)
             flash("Kommentti päivitetty")
         except comments.CommentError:
             flash("Virhe kommentin päivittämisessä", "error")
@@ -372,7 +372,7 @@ def delete_comment(destination_id, comment_id):
 
         try:
             comments.delete_comment(comment_id)
-            ratings_cache.update_cache(destination_id)
+            ratings.update_average_rating(destination_id)
             flash("Kommentti poistettu")
         except destinations.DestinationError:
             flash("Virhe kommentin poistamisessa", "error")

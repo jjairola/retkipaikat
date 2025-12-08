@@ -42,11 +42,10 @@ def get_destinations(
     SELECT d.id, d.name, d.description,
             d.user_id, u.username,
             GROUP_CONCAT(dc.title || ':' || dc.value, ';') classes,
-            rc.average_rating,
+            d.average_rating,
             di.image IS NOT NULL AS has_image
     FROM destinations d
     JOIN users u ON d.user_id = u.id
-    LEFT JOIN ratings_cache rc ON d.id = rc.destination_id
     LEFT JOIN destination_classes dc ON d.id = dc.destination_id
     LEFT JOIN comments c ON d.id = c.destination_id
     LEFT JOIN destination_images di ON d.id = di.destination_id

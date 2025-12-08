@@ -70,5 +70,24 @@ for i in range(1, COMMENT_COUNT + 1):
         ["comment" + str(i), user_id, destination_id, rating],
     )
 
+print("Update ratings")
+
+destinations = db.execute("""
+    SELECT d.id AS destination_id, ROUND(COALESCE(AVG(c.rating), 0), 1) AS average_rating
+    FROM destinations d
+    LEFT JOIN comments c ON c.destination_id = d.id
+    GROUP BY d.id
+    """).fetchall()
+
+data = set(destinations)
+
+db.executemany("""
+    UPDATE destinations
+    SET average_rating = ?
+    WHERE id = ?
+    """, data)
+
+print("Seed done.")
+
 db.commit()
 db.close()
