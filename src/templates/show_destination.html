@@ -19,6 +19,7 @@
             enctype="multipart/form-data">
             <label for="image">Päivitä kohteen kuva:</label>
             <input id="image" type="file" name="image" accept=".jpg,.png" />
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
             <input type="submit" value="Päivitä kuva" />
         </form>
         {% endif %}

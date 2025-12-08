@@ -429,6 +429,7 @@ def get_user(user_id):
 @app.route("/destination/<int:destination_id>/add-image", methods=["POST"])
 def add_destination_image(destination_id):
     utils.require_login()
+    utils.check_csrf()
 
     destionation = destinations.get_destination(destination_id)
     if not destionation:
