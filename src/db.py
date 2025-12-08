@@ -27,15 +27,6 @@ def execute(sql, params=None):
     g.last_insert_id = result.lastrowid
     con.close()
 
-
-def execute_many(sql, param_list):
-    print_query(sql, param_list)
-    con = get_connection()
-    con.executemany(sql, param_list)
-    con.commit()
-    con.close()
-
-
 def last_insert_id():
     return g.last_insert_id
 

@@ -1,6 +1,19 @@
 import random
 import sqlite3
 
+LOREM_IPSUM = """
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
+irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
+deserunt mollit anim id est laborum.""".split()
+
+
+def lorem_ipsum(length=100):
+    return " ".join(random.choices(LOREM_IPSUM, k=length)).capitalize()
+
+
 db = sqlite3.connect("database.db")
 
 db.execute("DELETE FROM users")
@@ -32,8 +45,8 @@ print("Destinations")
 for i in range(1, DESTINATION_COUNT + 1):
     user_id = random.randint(1, USER_COUNT)
     result = db.execute(
-        "INSERT INTO destinations (name, user_id) VALUES (?, ?)",
-        ["destinations" + str(i), user_id],
+        "INSERT INTO destinations (name, description, user_id) VALUES (?, ?, ?)",
+        ["destinations" + str(i), lorem_ipsum(), user_id],
     )
 
     destination_id = result.lastrowid
@@ -72,20 +85,23 @@ for i in range(1, COMMENT_COUNT + 1):
 
 print("Update ratings")
 
-destinations = db.execute("""
-    SELECT d.id AS destination_id, ROUND(COALESCE(AVG(c.rating), 0), 1) AS average_rating
+destinations_averages = db.execute(
+    """
+    SELECT ROUND(COALESCE(AVG(c.rating), 0), 1) AS average_rating, d.id AS destination_id
     FROM destinations d
     LEFT JOIN comments c ON c.destination_id = d.id
     GROUP BY d.id
-    """).fetchall()
+    """
+).fetchall()
 
-data = set(destinations)
-
-db.executemany("""
+db.executemany(
+    """
     UPDATE destinations
     SET average_rating = ?
     WHERE id = ?
-    """, data)
+    """,
+    destinations_averages,
+)
 
 print("Seed done.")
 
