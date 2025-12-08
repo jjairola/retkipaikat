@@ -98,8 +98,8 @@ def add_destination():
             return redirect(url_for("add_destination"))
 
         description = request.form.get("description")
-        if not description or len(description) < 10 or len(description) > 500:
-            flash("Kuvauksen pitää olla 10-500 merkkiä pitkä.", "error")
+        if not description or len(description) < 10 or len(description) > 1000:
+            flash("Kuvauksen pitää olla 10-1000 merkkiä pitkä.", "error")
             return redirect(url_for("add_destination"))
 
         selected_classes = []
@@ -154,7 +154,14 @@ def edit_destination(destination_id):
             return redirect(url_for("get_destination", destination_id=destination_id))
 
         name = request.form.get("name")
+        if not name or len(name) < 5 or len(name) > 80:
+            flash("Nimen pitää olla 5-80 merkkiä pitkä.", "error")
+            return redirect(url_for("edit_destination", destination_id=destination_id))
+
         description = request.form.get("description")
+        if not description or len(description) < 10 or len(description) > 1000:
+            flash("Kuvauksen pitää olla 10-1000 merkkiä pitkä.", "error")
+            return redirect(url_for("edit_destination", destination_id=destination_id))
 
         selected_classes = []
         for entry in request.form.getlist("classes"):

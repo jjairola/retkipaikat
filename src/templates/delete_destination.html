@@ -7,6 +7,9 @@
 
 <p>Oletko varma, että haluat poistaa tämän retkipaikan?</p>
 
-{% include "partials/delete_form.html" %}
+    
+{% with action='delete' %}
+{% include "partials/destination_form.html" %}
+{% endwith %}
 
 {% endblock %}

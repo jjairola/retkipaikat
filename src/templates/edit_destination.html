@@ -5,7 +5,7 @@
 {% block content %}
 <h2>Muokkaa retkipaikkaa: {{ destination.name }}</h2>
 
-{% with submit_text="Tallenna muutokset", edit=True %}
+{% with action='edit' %}
 {% include "partials/destination_form.html" %}
 {% endwith %}
 

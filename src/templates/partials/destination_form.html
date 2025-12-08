@@ -1,12 +1,15 @@
 <form class="mb-4" method="post">
     <div>
         <label for="name">Nimi</label>
-        <input id="name" type="text" name="name" value="{{ destination.name }}" required minlength="5" maxlength="80" />
+        <input {% if action=='delete' %}disabled{% endif %} id="name" type="text" name="name"
+            value="{{ destination.name }}" required minlength="5" maxlength="80"
+            title="Nimen pitää olla 5-80 merkkiä pitkä." />
     </div>
     <div>
         <label for="description">Kuvaus</label>
-        <textarea id="description" name="description" rows="4" cols="50" minlength="10" maxlength="1000"
-            required>{{ destination.description }}</textarea>
+        <textarea {% if action=='delete' %}disabled{% endif %} id="description" name="description" rows="4" cols="50"
+            minlength="10" maxlength="1000" required
+            title="Kuvauksen pitää olla 10-1000 merkkiä pitkä.">{{ destination.description }}</textarea>
     </div>
     <div>
         {% for class in classes %}
@@ -26,11 +29,18 @@
         </p>
         {% endfor %}
     </div>
-    
+
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
 
-    {% if edit %}
+    {% if action=='edit' or action=='delete' %}
     <button type="submit" name="action" value="cancel">Peruuta</button>
     {% endif %}
-    <button type="submit" name="action" value="update">{{ submit_text }}</button>
+
+    {% if action=='add' %}
+    <button type="submit" name="action" value="submit">Lisää retkipaikka</button>
+    {% elif action=='edit' %}
+    <button type="submit" name="action" value="submit">Tallenna muutokset</button>
+    {% elif action=='delete' %}
+    <button type="submit" name="action" value="delete" class="danger">Poista retkipaikka</button>
+    {% endif %}
 </form>

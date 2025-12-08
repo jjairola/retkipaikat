@@ -5,7 +5,7 @@
 {% block content %}
 <h2>Uusi retkipaikka</h2>
 
-{% with submit_text = "Lisää uusi" %}
+{% with action = 'add' %}
 {% include "partials/destination_form.html" %}
 {% endwith %}
 {% endblock %}
